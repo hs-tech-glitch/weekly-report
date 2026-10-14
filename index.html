@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f1b2d"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주간보고">
-<title>HS TECH 주간보고 v0.62</title>
+<title>HS TECH 주간보고 v0.63</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -135,7 +135,7 @@ h2{font-size:14px;margin:0 0 10px;color:var(--navy);padding-bottom:6px;border-bo
 .side details[open] summary:after{transform:rotate(-90deg)}
 @media(max-width:860px){.calwrap{grid-template-columns:1fr}}
 @media(max-width:640px){.cell{min-height:64px;padding:4px}.ev{font-size:10px;padding:1px 3px}.cal .dh{font-size:11px}}
-/* 보고서 v0.62 */
+/* 보고서 v0.63 */
 table.rep.sales{table-layout:auto;font-size:11.5px}
 table.rep.sales th{padding:6px 4px;font-size:11px;line-height:1.25}
 table.rep.sales td{padding:6px 5px}
@@ -161,7 +161,7 @@ details.oth table{margin-top:8px}
 .two textarea.note{min-height:70px;background:#fffdf5}
 @media(max-width:640px){.two{grid-template-columns:1fr}.two>div+div{border-left:none;border-top:1px solid #bbb}}
 @media print{.brsel{display:none}.pbr{display:inline}.doc h3.pb{break-before:page}table.rep.sales{font-size:9px}table.rep.sales th{font-size:9.5px}}
-/* 보고서 v0.62 */
+/* 보고서 v0.63 */
 .rsec h3 .hx{margin-left:auto}
 .rsec h3>span{display:flex;align-items:center;gap:8px}
 .hx{border:1px solid var(--line2);background:#fff;border-radius:4px;font-size:11px;color:var(--sub);padding:1px 7px;font-weight:600}
@@ -395,7 +395,7 @@ textarea.note:focus{border-style:solid;border-color:var(--navy)}
   .doc{padding:18px 14px;overflow-x:auto}table.rep{min-width:560px}.doc .top{grid-template-columns:1fr}.doc .meta div{grid-template-columns:70px 1fr}.doc .meta div>span:nth-child(2){border-right:none}
 }
 @media print{
-  @page{size:A4 landscape;margin:10mm 12mm}   /* v0.62 가로 한 장 */
+  @page{size:A4 landscape;margin:10mm 12mm}   /* v0.63 가로 한 장 */
   table.rep th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   table.rep td.cm{background:#fff!important}
   .note-line,.pn,.tb{background:#fff!important}
@@ -404,7 +404,7 @@ textarea.note:focus{border-style:solid;border-color:var(--navy)}
   header,nav.tabs,.noprint,.toast{display:none!important}
   .app{max-width:none;padding:0}
   .doc{border:none;box-shadow:none;padding:0;max-width:none}
-  .rlay{display:block}   /* v0.62 옆 칸(체크리스트) 자리 없애고 종이 폭 전부 사용 */
+  .rlay{display:block}   /* v0.63 옆 칸(체크리스트) 자리 없애고 종이 폭 전부 사용 */
   table.rep{font-size:11px}table.rep th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .doc h3{break-after:avoid}table.rep tr{break-inside:avoid}
   textarea.note{display:none}
@@ -415,7 +415,7 @@ textarea.note:focus{border-style:solid;border-color:var(--navy)}
 <body>
 <div class="app">
 <header>
-  <div class="logo"><b>HS</b> 주간 업무보고 <span id="verBadge" class="sub" style="font-size:11px">v0.62</span></div>
+  <div class="logo"><b>HS</b> 주간 업무보고 <span id="verBadge" class="sub" style="font-size:11px">v0.63</span></div>
   <span class="pill ghost sub" id="periodLabel">불러오는 중…</span>
   <div class="spacer"></div>
   <div class="row" id="peopleChips"></div>
@@ -534,11 +534,11 @@ textarea.note:focus{border-style:solid;border-color:var(--navy)}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ───────── 서버 연결 — v0.62 ─────────
+/* ───────── 서버 연결 — v0.63 ─────────
    깃허브 주소로 열면        → 실서버 (진짜 DB)
    윈도우에서 더블클릭(file://) → 테스트 서버 (실DB 복사본, 캘린더 안 건드림)
    주소 끝에 ?demo           → 체험 모드 (이 브라우저에만 저장)   / ?live ?test 로 강제 지정도 가능 */
-var WR_API='https://script.google.com/macros/s/AKfycbzWBftXG27CHBqzrdgNNp36d6yl6fA8gRG6iSWze98yKrvMDpyUJmugD9DWA1h8xKzx/exec';
+var WR_API='https://script.google.com/macros/s/AKfycby4GCq8UW7OOVHQdw1XOf2mcyGevz0mcfsJ0SwRU8aRV8qhLL9-4UuRFWdxsSOCpEer/exec';   // v0.63 배포 하나로 통일 — 실서버/테스트 구분은 요청의 test 표시로(테스트는 복사본 DB). 옛 실서버 배포(AKfycbzWBftX…)는 보관처리돼 끊김
 var WR_API_TEST='https://script.google.com/macros/s/AKfycby4GCq8UW7OOVHQdw1XOf2mcyGevz0mcfsJ0SwRU8aRV8qhLL9-4UuRFWdxsSOCpEer/exec';
 var WR_MODE=(function(){var q=location.search;if(/[?&]demo\b/.test(q))return 'demo';if(/[?&]live\b/.test(q))return 'live';if(/[?&]test\b/.test(q))return 'test';return location.protocol==='file:'?'test':'live'})();
 (function(){
@@ -697,7 +697,7 @@ function salesCompute_(all, p, cmap, brands, imap) {
   function build(p){var end=ad(p,6),t=today(),asOf=t<p?ad(p,-1):(t>end?end:t),all=rng(p),week=all.filter(function(i){return i.date<=asOf}),next=all.filter(function(i){return i.date>asOf});var c={};TYPES.forEach(function(t){c[t]={};PEOPLE.forEach(function(q){c[t][q]=0})});week.forEach(function(i){if(c[i.type]&&c[i.type][i.person]!==undefined)c[i.type][i.person]++});var pv={};var pi=live().filter(function(i){return i.date>=ad(p,-7)&&i.date<ad(p,0)});TYPES.forEach(function(t){pv[t]=pi.filter(function(i){return i.type===t}).length});var r=rep(p);var notes=Object.assign({},r.notes);notes.sections=sectionsFor(p,notes);
     return{period:p,end:end,asOf:asOf,next:ad(p,7),deadline:dlOf(p),deadlineCustom:!!r.deadlineAt,week:week,nextWeek:next,counts:c,prev:pv,blockers:all.filter(function(i){return isIss(i)&&i.date<=end}),resolved:live().filter(function(i){return i.status==='해결'&&i.resolved>=p&&i.resolved<=end+' 23:59'}),notes:notes,closedAt:r.closedAt,finalAt:r.finalAt,people:PEOPLE,types:TYPES,sales:salesFor(p),labels:labels()}}
   var api={
-    wrBootstrap:function(p){p=p||P;var r=rep(p);return{ok:true,version:'v0.62 체험',people:PEOPLE,lead:'김길웅',types:TYPES,status:ST,period:p,current:P,deadline:dlOf(p),deadlineCustom:!!r.deadlineAt,now:now(),closed:!!r.finalAt,reminded:!!r.closedAt,finalized:!!r.finalAt,hasQuoteDb:true,hasAI:true,items:rng(p),prevPending:(function(){var q=ad(p,-7),rr=db.reports[q];if(rr&&rr.finalAt)return null;if(!rng(q).length)return null;return{period:q,deadline:dlOf(q),custom:!!(rr&&rr.deadlineAt)}})()}},
+    wrBootstrap:function(p){p=p||P;var r=rep(p);return{ok:true,version:'v0.63 체험',people:PEOPLE,lead:'김길웅',types:TYPES,status:ST,period:p,current:P,deadline:dlOf(p),deadlineCustom:!!r.deadlineAt,now:now(),closed:!!r.finalAt,reminded:!!r.closedAt,finalized:!!r.finalAt,hasQuoteDb:true,hasAI:true,items:rng(p),prevPending:(function(){var q=ad(p,-7),rr=db.reports[q];if(rr&&rr.finalAt)return null;if(!rng(q).length)return null;return{period:q,deadline:dlOf(q),custom:!!(rr&&rr.deadlineAt)}})()}},
     wrListItems:function(p){return{ok:true,period:p,items:rng(p)}},
     wrListRange:function(a,b){return{ok:true,items:live().filter(function(i){return i.date>=a&&i.date<=b})}},
     wrSaveItem:function(it){if(it.status==='해결')it.resolved=it.resolved||now();else it.resolved='';var hit=it.id&&db.items.filter(function(x){return x.id===it.id})[0];if(hit){Object.assign(hit,it)}else{it.id='l'+Date.now().toString(36);it.created=now();db.items.push(it)}it.updated=now();sv();return{ok:true,item:it}},
@@ -747,7 +747,7 @@ function salesCompute_(all, p, cmap, brands, imap) {
 /* ───────── 상태 ───────── */
 var S = { boot:null, items:[], person:null, period:null, day:null, view:'my', boardMode:'status',calMode:'mine',inbound:[],calItems:null,calMonth:null,calSel:null,calUpOpen:false,calFocus:null,calView:(window.innerWidth<=640?'list':'month'),weekStart:null, report:null, editing:null };
 var DOW = ['일','월','화','수','목','금','토'];
-/* v0.62 오타 허용: 자모 단위로 1글자 차이까지 같은 말로 봄 (견젹→견적, 납풒→납품) */
+/* v0.63 오타 허용: 자모 단위로 1글자 차이까지 같은 말로 봄 (견젹→견적, 납풒→납품) */
 function jamo_(s){var o=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c>=0xAC00&&c<=0xD7A3){c-=0xAC00;o.push(Math.floor(c/588),Math.floor(c%588/28),c%28)}else o.push(c)}return o}
 function jdist_(a,b){a=jamo_(a);b=jamo_(b);if(a.length!==b.length)return 9;var d=0;for(var i=0;i<a.length;i++){if(a[i]!==b[i]){if(i%3===0)return 9;d++}}return d}   // 같은 길이, 초성은 그대로, 중성·종성만 1개 다를 때
 var TYPE_WORDS=['미팅','방문','회의','견적','제안','수주','발주','포장','납품','출고','배송','기술지원','수리','설치','교정','캘리','내근','기타'];
@@ -794,12 +794,12 @@ function renderHeader(){
 }
 function renderAll(){renderMy();renderBoard();if(S.view==='cal')renderCal();if(S.view==='report')loadReport();}
 
-/* v0.62 처음 열었을 때 '누구세요?' — 이름을 고르면 이 휴대폰/PC에 기억 */
+/* v0.63 처음 열었을 때 '누구세요?' — 이름을 고르면 이 휴대폰/PC에 기억 */
 function askWho(){var wrap=el('div','modal show who');wrap.style.zIndex=70;var sh=el('div','sheet');sh.style.cssText='max-width:420px;height:auto;border-radius:14px;padding:0 18px 22px';sh.innerHTML='<div class="row"><h2>누구세요?</h2></div><div class="sub" style="margin:4px 0 14px">이름을 고르면 이 기기에 기억해 두고, 다음부터는 바로 내 업무가 열립니다. 위쪽 이름 버튼으로 언제든 바꿀 수 있어요.</div>';
   var box=el('div',null);box.style.cssText='display:grid;gap:10px';S.boot.people.forEach(function(p){var c=el('button','btn primary',esc(p));c.style.cssText='font-size:17px;padding:14px;white-space:nowrap';c.onclick=function(){S.person=p;store('wr_person',p);wrap.remove();renderHeader();renderAll();loadCandidates();toast(p+'님으로 시작합니다')};box.appendChild(c)});sh.appendChild(box);wrap.appendChild(sh);document.body.appendChild(wrap)}
-/* v0.62 지난 기간을 보다가 다른 탭으로 가면 자동으로 현재 기간으로 복귀 (옛 주에 업무가 잘못 들어가는 것 방지) */
+/* v0.63 지난 기간을 보다가 다른 탭으로 가면 자동으로 현재 기간으로 복귀 (옛 주에 업무가 잘못 들어가는 것 방지) */
 function backToCurrent(){if(!S.boot||S.period===S.boot.current)return;S.period=S.boot.current;S.report=null;S.boot.closed=S.boot.closedCur||false;var t=todayKst();var days=periodDays(S.period);S.day=days.indexOf(t)>=0?t:(t>days[4]?days[4]:days[0]);renderHeader();gs('wrListItems',S.period).then(function(x){if(x.ok){S.items=x.items;renderAll()}})}
-/* v0.62 휴대폰을 다시 켰을 때(3분 이상 지났으면) 팀원이 올린 것 새로 받기 */
+/* v0.63 휴대폰을 다시 켰을 때(3분 이상 지났으면) 팀원이 올린 것 새로 받기 */
 var _lastSeen=Date.now();document.addEventListener('visibilitychange',function(){if(document.hidden){_lastSeen=Date.now();if(S.view==='board')boardMarkSeen();return}if(!S.boot||Date.now()-_lastSeen<180e3)return;gs('wrListItems',S.period).then(function(x){if(x.ok){S.items=x.items;renderAll();if(S.view==='cal')loadCal()}}).catch(function(){})});
 /* ───────── 탭 ───────── */
 $('#tabs').onclick=function(e){var b=e.target.closest('button');if(b)setView(b.dataset.v)};
@@ -835,7 +835,7 @@ function renderMy(){
 }
 function isIssue(i){return i.status==='이슈'||i.status==='블로커'}
 function isResolved(i){return i.status==='해결'}
-/* v0.62 이슈 해결: 지우지 않고 '해결' 상태로 남김 → 보드 '주째'에서 빠지고 그 주 보고서에 '해결된 이슈'로 표시 */
+/* v0.63 이슈 해결: 지우지 않고 '해결' 상태로 남김 → 보드 '주째'에서 빠지고 그 주 보고서에 '해결된 이슈'로 표시 */
 function resolveItem(i){if(!isIssue(i))return;if(!confirm('"'+(i.cust||i.content)+'" 이슈를 해결로 표시할까요?\n이번 주 보고서에 해결된 이슈로 남습니다.'))return;i.status='해결';i.resolved=nowKstStr();save(i);renderAll();toast('✅ 해결로 표시 — 보고서 이슈 칸에 "해결됨"으로 남아요')}
 function noteHtml(i){return i.note?'<div class="lnote">💬 팀장: '+esc(i.note)+'</div>':''}
 function isLeadNow(){return S.boot&&S.person===S.boot.lead}
@@ -849,7 +849,7 @@ function itemCard(i,showDate){
   var right=el('div','row');
   var st=el('button','tag st '+(isIssue(i)?'s-이슈':'ghost'),isIssue(i)?'⚠ 이슈':'이슈');st.title='이슈(결정 필요)로 표시 / 해제';
   st.onclick=function(e){e.stopPropagation();i.status='이슈';i.resolved='';renderAll();save(i)};
-  if(isIssue(i)){st.textContent='⚠ 해결';st.title='이슈 해결로 표시 (이슈 표시만 빼려면 수정창에서 체크 해제)';st.onclick=function(e){e.stopPropagation();resolveItem(i)}}   // v0.62 이슈 건은 버튼이 '해결'
+  if(isIssue(i)){st.textContent='⚠ 해결';st.title='이슈 해결로 표시 (이슈 표시만 빼려면 수정창에서 체크 해제)';st.onclick=function(e){e.stopPropagation();resolveItem(i)}}   // v0.63 이슈 건은 버튼이 '해결'
   if(isResolved(i)){st.className='tag st s-해결';st.textContent='✅ 해결';st.title='해결됨 — 누르면 다시 이슈로';st.onclick=function(e){e.stopPropagation();if(!confirm('다시 이슈로 되돌릴까요?'))return;i.status='이슈';i.resolved='';renderAll();save(i)}}
   var del=el('button','del','✕');del.onclick=function(e){e.stopPropagation();remove(i)};
   right.appendChild(st);right.appendChild(del);
@@ -857,7 +857,7 @@ function itemCard(i,showDate){
 }
 
 /* 빠른 입력 파싱 */
-/* ───────── 한 줄 입력 해석 v2 (v0.62) — 사람이 적는 대로: 순서 자유, 조사 붙어도, 날짜/금액/동행/기간/휴가/영어 ─────────
+/* ───────── 한 줄 입력 해석 v2 (v0.63) — 사람이 적는 대로: 순서 자유, 조사 붙어도, 날짜/금액/동행/기간/휴가/영어 ─────────
    예) "내일 오후 2시 SK하이닉스 미팅" "하이닉스에 HMT330 4대 납품함" "두산 수주 860만원" "연차 @금" "SEDEX 전시회 수목금 규호랑" */
 var WD_={'월':0,'화':1,'수':2,'목':3,'금':4,'토':5,'일':6};
 var OFFWORK_=/^(휴가|연차|반차|병가|월차|공가|경조사|교육|세미나|워크샵|워크숍|재택)$/;
@@ -950,7 +950,7 @@ function quickAdd(){var v=$('#quick').value;if(!v.trim())return;if(v.trim()===_l
     days.forEach(function(d){var c=Object.assign({},it);c.date=d;c.id=null;c._tmp='t'+Date.now()+d+total;S.items.push(c);save(c);total++})});renderAll();
   if(lines.length>1)toast(lines.length+'줄 → '+total+'건 추가');
   else if(last)toast(last.type.replace(/\/.*/,'')+' · '+(last.cust||'항목')+(total>1?' '+total+'일치':'')+(last.with?' · 동행 '+last.with:'')+' 추가')}
-/* v0.62 대충 적기 → AI 정리: 메모를 Gemini(GAS wrAiParse)로 항목화 → 확인 후 추가. 실패하면 줄마다 기본 해석으로 */
+/* v0.63 대충 적기 → AI 정리: 메모를 Gemini(GAS wrAiParse)로 항목화 → 확인 후 추가. 실패하면 줄마다 기본 해석으로 */
 function aiTidy(){var v=$('#quick').value.trim();if(!v){toast('먼저 메모를 적어 주세요 — 미팅 끝나고 생각나는 대로, 여러 줄도 됩니다');$('#quick').focus();return}
   var btn=$('#aiBtn');btn.disabled=true;btn.textContent='정리 중…';
   gs('wrAiParse',v,{known:knownCusts().map(function(c){return c.name}).slice(0,100),person:S.person}).then(function(r){btn.disabled=false;btn.textContent='✨ AI';
@@ -970,7 +970,7 @@ function openAiPreview(items,raw){
     sh.querySelector('#aiAll').onclick=function(){var n=0;items.forEach(function(i,k){if(!sel[k])return;var c=Object.assign({},i);c.id=null;c._tmp='t'+Date.now()+k;S.items.push(c);save(c);n++});renderAll();$('#quick').value='';quickGrow();close();toast(n+'건 추가 — 내 업무에서 확인하세요')};
     sh.querySelector('#aiRaw').onclick=function(){close();quickAdd()}};
   draw()}
-/* v0.62 인쇄: A4 가로 한 장에 맞게 축소 (인쇄 가능 영역 273×190mm ≈ 1032×718px). 내용이 길면 글자를 줄여서라도 한 장, 절반 아래로는 안 줄임 */
+/* v0.63 인쇄: A4 가로 한 장에 맞게 축소 (인쇄 가능 영역 273×190mm ≈ 1032×718px). 내용이 길면 글자를 줄여서라도 한 장, 절반 아래로는 안 줄임 */
 function fitPrint(){var d=document.querySelector('#reportRoot .doc');if(!d||S.view!=='report')return;try{prepPrint()}catch(e){}document.body.classList.add('pz');var W=1032,Hmax=S._pHmax||650,z=1;
   for(var i=0;i<16;i++){document.body.style.zoom=z;d.style.width=Math.round(W/z)+'px';var h=d.scrollHeight*z;if(h<=Hmax||z<=0.45)break;z=Math.max(0.45,Math.round((z-0.04)*100)/100)}
   d.style.width='';document.body.classList.remove('pz');S._pz=z}   // zoom은 body에(.doc에 걸면 인쇄에 안 먹음) · 폭은 재기만 하고 풀어둠(고정하면 가로로 넘쳐 2장 됨)
@@ -981,7 +981,7 @@ $('#quickBtn').onclick=quickAdd;$('#aiBtn').onclick=aiTidy;$('#quick').onkeydown
 $('#addNext').onclick=function(){openEdit({person:S.person,date:addDays(S.period,7),type:'미팅/방문',status:'',cust:'',end:'',prod:'',content:''},true)};
 
 /* 저장/삭제 */
-/* v0.62 전파가 안 터져 저장이 실패하면 이 기기에 보관했다가(대기열) 다음에 열거나 인터넷이 돌아오면 자동으로 다시 보냄 */
+/* v0.63 전파가 안 터져 저장이 실패하면 이 기기에 보관했다가(대기열) 다음에 열거나 인터넷이 돌아오면 자동으로 다시 보냄 */
 function pendQ(){try{return JSON.parse(localStorage.getItem('wr_pending')||'[]')}catch(e){return[]}}
 function pendSet(q){try{localStorage.setItem('wr_pending',JSON.stringify(q))}catch(e){}renderPend()}
 function renderPend(){var n=pendQ().length,b=$('#pendBar');if(!n){if(b)b.remove();return}if(!b){b=el('div','banner warn noprint');b.id='pendBar';b.style.cssText='margin:8px 0 0;cursor:pointer';$('#v-my').insertBefore(b,$('#v-my').firstChild)}b.innerHTML='📡 아직 서버에 못 보낸 업무 '+n+'건 — 인터넷이 되면 자동으로 보냅니다 · <u>지금 다시 보내기</u>';b.onclick=flushPend}
@@ -1035,7 +1035,7 @@ function openEdit(it,isNew){
   $('#mDelete').onclick=function(){m.classList.remove('show');remove(it)};
   if(window.innerWidth>640)setTimeout(function(){$('#mCust').focus()},50);else $('#modal .sheet').scrollTop=0;
 }
-/* v0.62 휴대폰 입력 편하게: 날짜 빠른 선택 · 최근 고객사 · 고객사/제품 자동완성 · ＋ 버튼 */
+/* v0.63 휴대폰 입력 편하게: 날짜 빠른 선택 · 최근 고객사 · 고객사/제품 자동완성 · ＋ 버튼 */
 function drawDays(){var box=$('#mDays');if(!box)return;box.innerHTML='';var t=todayKst(),cur=$('#mDate').value;
   var opts=[['오늘',t],['내일',addDays(t,1)]].concat(['월','화','수','목','금'].map(function(w,i){return[w+' '+(+addDays(S.period,i).slice(8)),addDays(S.period,i)]})).concat([['다음주 월',addDays(S.period,7)]]);
   var seen={};opts.forEach(function(o){if(seen[o[0]])return;seen[o[0]]=1;var c=el('span','tag'+(o[1]===cur?' on':''),esc(o[0]));c.onclick=function(){$('#mDate').value=o[1];drawDays()};box.appendChild(c)})}
@@ -1116,21 +1116,21 @@ function renderCal(){
     var c=el('div','cell'+(out?' out':'')+(d===t?' today':'')+(d<t&&!out?' past':'')+(dw===0?' sun':dw===6?' sat':''));
     c.innerHTML='<div class="d"><span>'+(+d.slice(8))+'</span>'+(d===t?'<span class="tod">오늘</span>':'')+'</div>';
     var evs=[];
-    // v0.62 입고는 하루에 칩 하나 (📦 N건, 색은 가장 급한 상태) — 누르면 아래 상세에 한 건씩. 월간 칸이 좁아서 낱개로 쌓이면 읽을 수가 없음
+    // v0.63 입고는 하루에 칩 하나 (📦 N건, 색은 가장 급한 상태) — 누르면 아래 상세에 한 건씩. 월간 칸이 좁아서 낱개로 쌓이면 읽을 수가 없음
     var dayIn=(byDay[d]||[]).slice().sort(function(a,b){return ({late:0,cus:1,ship:2,wait:3,done:4})[inStage(a.status)]-({late:0,cus:1,ship:2,wait:3,done:4})[inStage(b.status)]});
     if(dayIn.length){var st0=inStage(dayIn[0].status);var owners=[];dayIn.forEach(function(x){if(x.owner&&owners.indexOf(x.owner)<0)owners.push(x.owner)});
       var e0=el('div','ev in '+st0+(S.calFocus==='in:'+d?' focus':''),'📦 '+(dayIn.length>1?dayIn.length+'건':esc(dayIn[0].cust||'입고').slice(0,6))+(st0==='late'?' 지연':''));
       e0.title=dayIn.map(function(x){return (x.cust||'')+' '+x.model+(x.qty?'×'+x.qty:'')+(x.owner?' · '+x.owner:'')+(x.status?' · '+x.status:'')}).join('\n');
       e0.onclick=(function(d){return function(ev){ev.stopPropagation();S.calSel=d;S.calFocus='in:'+d;renderCal()}})(d);evs.push(e0)}
     items.filter(function(i){return i.date===d}).sort(sortItems).forEach(function(i){var e=el('div','ev '+tcls(i.type)+(S.calFocus===i.id?' focus':'')+(i.date>t?' fut':''),(!mine?esc(String(whoText(i)).slice(0,1))+' ':'')+esc(calType(i.type))+(isIssue(i)?' ⚠':''));e.title=i.person+' · '+i.type+' · '+i.cust+(i.end?' → '+i.end:'')+(i.prod?' · '+i.prod:'')+'\n'+(i.content||'');e.onclick=(function(d,i){return function(ev){ev.stopPropagation();S.calSel=d;S.calFocus=i.id;renderCal()}})(d,i);evs.push(e)});
-    if(window.innerWidth<=640){   // v0.62 휴대폰: 칸이 좁아 칩 대신 숫자 배지(📦 입고 N · 📝 업무 N, 이슈면 ⚠) — 날짜를 누르면 아래에 상세
+    if(window.innerWidth<=640){   // v0.63 휴대폰: 칸이 좁아 칩 대신 숫자 배지(📦 입고 N · 📝 업무 N, 이슈면 ⚠) — 날짜를 누르면 아래에 상세
       var dayIt=items.filter(function(i){return i.date===d});var row=el('div','mini');
       if(dayIn.length)row.appendChild(el('span','mb in '+inStage(dayIn[0].status),'📦'+dayIn.length));
       if(dayIt.length)row.appendChild(el('span','mb it'+(dayIt.some(isIssue)?' iss':''),(dayIt.some(isIssue)?'⚠':'📝')+dayIt.length));
       if(row.children.length)c.appendChild(row)}
     else{var max=6;evs.slice(0,max).forEach(function(e){c.appendChild(e)});if(evs.length>max)c.appendChild(el('div','ev more','+'+(evs.length-max)+'건 더'))}
     if(d===(S.calSel||t))c.classList.add('sel');
-    c.onclick=(function(d){return function(){S.calSel=d;S.calFocus=null;renderCal();if(window.innerWidth<=640){var sd=$('#calSide');if(sd)sd.scrollIntoView({behavior:'smooth',block:'start'})}}})(d);   // v0.62 휴대폰: 날짜 누르면 아래 상세로 스크롤
+    c.onclick=(function(d){return function(){S.calSel=d;S.calFocus=null;renderCal();if(window.innerWidth<=640){var sd=$('#calSide');if(sd)sd.scrollIntoView({behavior:'smooth',block:'start'})}}})(d);   // v0.63 휴대폰: 날짜 누르면 아래 상세로 스크롤
     c.ondblclick=(function(d){return function(){openEdit({person:S.person,date:d,type:'미팅/방문',status:'',cust:'',end:'',prod:'',content:''},true)}})(d);
     g.appendChild(c);
   }
@@ -1180,11 +1180,11 @@ window.addEventListener('resize',function(){clearTimeout(S._rz);S._rz=setTimeout
 /* ───────── 팀 보드 ───────── */
 $('#boardMode').onclick=function(e){var t=e.target.closest('.tag');if(!t)return;S.boardMode=t.dataset.m;[].forEach.call(this.children,function(c){c.classList.toggle('on',c===t)});renderBoard()};
 $('#boardWeek').onclick=function(e){var t=e.target.closest('.tag');if(!t)return;S.boardWeek=+t.dataset.w;[].forEach.call(this.children,function(c){c.classList.toggle('on',c===t)});renderBoard()};
-/* v0.62 NEW 표시: 마지막으로 보드를 떠난 시각(기기별) 이후에 올라오거나 고쳐진 남의 건 */
+/* v0.63 NEW 표시: 마지막으로 보드를 떠난 시각(기기별) 이후에 올라오거나 고쳐진 남의 건 */
 function boardSeenKey(){return 'wr_board_seen_'+(S.person||'')}
 function boardSeen(){try{return localStorage.getItem(boardSeenKey())||''}catch(e){return ''}}
 function boardMarkSeen(){try{localStorage.setItem(boardSeenKey(),nowKstStr())}catch(e){}}
-/* v0.62 이어지는 이슈: 지난 8주 안에 아직 '이슈'인 건을 이번 주 보드에도 보여줌 (N주째) */
+/* v0.63 이어지는 이슈: 지난 8주 안에 아직 '이슈'인 건을 이번 주 보드에도 보여줌 (N주째) */
 function loadPastIssues(){var from=addDays(S.period,-56),to=addDays(S.period,-1),key=from+to;if(S._pastIssKey===key)return;S._pastIssKey=key;S._pastIss=[];
   gs('wrListRange',from,to).then(function(r){if(!r.ok||S._pastIssKey!==key)return;S._pastIss=(r.items||[]).filter(isIssue);if(S.view==='board')renderBoard()})}
 function weeksAgo(d){return Math.round((new Date(S.period)-new Date(periodOf(d)))/864e5/7)}
@@ -1213,7 +1213,7 @@ function renderBoard(){
   });
   if(nNew&&!S._newToasted){S._newToasted=true;toast('새로 올라온 건 '+nNew+'개 (NEW 표시)')}
 }
-/* v0.62 나도 같이: 남의 건에 내 이름을 동행으로 넣음 → 내 업무에도 보임 */
+/* v0.63 나도 같이: 남의 건에 내 이름을 동행으로 넣음 → 내 업무에도 보임 */
 function joinItem(i){if(!S.person||involves(i,S.person))return;if(!confirm(i.person+'님의 "'+(i.cust||i.content)+'" 건에 동행으로 들어갈까요?\n내 업무에도 같이 보입니다.'))return;
   var w=withList(i);w.push(S.person);i.with=w.join(',');save(i);renderAll();toast('동행으로 추가 — 내 업무에서도 보여요')}
 
@@ -1434,7 +1434,7 @@ function openBrands(){
     draw();
   });
 }
-/* ───────── v0.62 마감 미루기 (알림 시각만 바뀜, 잠금은 확정 때) ───────── */
+/* ───────── v0.63 마감 미루기 (알림 시각만 바뀜, 잠금은 확정 때) ───────── */
 function openDeadline(r){
   var wrap=el('div','modal show who');wrap.style.zIndex=60;var sh=el('div','sheet');sh.style.cssText='max-width:460px;height:auto;border-radius:14px;padding:0 18px 18px';wrap.appendChild(sh);document.body.appendChild(wrap);
   var close=function(){wrap.remove()};wrap.onclick=function(e){if(e.target===wrap)close()};
