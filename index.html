@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.32 -->
+<!-- 주간보고 화면 v1.33 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.32</title>
+<title>HS TECH 주간보고 v1.33</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -128,7 +128,7 @@ h2{font-size:14px;margin:0 0 10px;color:var(--navy);padding-bottom:6px;border-bo
 .msec.noamt .ml{grid-template-columns:72px 112px minmax(0,1fr)}.msec.noamt .ml .ma{display:none}
 .ml .mp{color:var(--text)}.ml .m2{display:block;color:var(--text);margin-top:2px;line-height:1.55}.ml .mmain b{font-size:1.03em}.ml .m2.mtx{margin-top:0}
 .ml .ma{text-align:right}
-.ml.msum{cursor:default;border-top:2px solid var(--navy);background:#f6f8fb}.ml .mbr{color:var(--navy);font-weight:800}
+.ml.msum{cursor:default;border-top:2px solid var(--navy);background:#f6f8fb}.ml .mbr{color:var(--navy);font-weight:800;cursor:pointer}.ml .mbr0{color:var(--sub);font-weight:600;border-bottom:1px dashed var(--line,#ccd)}
 .ml.iss b{color:var(--bad)}
 .ml.new::after{content:'NEW';position:absolute;top:3px;right:2px;background:var(--bad);color:#fff;font-size:9px;font-weight:800;padding:0 5px;border-radius:999px}
 .ml .carry{display:inline-block;background:var(--bad-bg);color:var(--bad);border-radius:999px;font-size:10.5px;font-weight:700;padding:0 7px}
@@ -694,6 +694,9 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
     <div class="g2">
       <div class="field"><label>제품</label><input id="mProd" list="dlProd" autocomplete="off"></div>
       <div class="field"><label>금액</label><input id="mAmt" inputmode="numeric" placeholder="₩"></div>
+    </div>
+    <div class="g2" id="mBrandRow" style="display:none">
+      <div class="field"><label>브랜드</label><select id="mBrand"></select></div><div class="field"></div>
     </div>
     <div class="field"><label>내용</label><textarea id="mContent" rows="3"></textarea></div>
     <div class="field" id="mNoteWrap" style="display:none"><textarea id="mNote" rows="2"></textarea></div>
@@ -2660,6 +2663,7 @@ function renderHeader() {
 }
 
 function renderAll() {
+  loadBrands_();
   renderMy();
   renderBoard();
   if (S.view === 'cal') renderCal();
@@ -4238,15 +4242,43 @@ function openEdit(it, isNew) {
     type: it.type,
     status: it.status
   };
+  var brRow = $('#mBrandRow'), brSel = $('#mBrand'), showBr = function() {
+    brRow.style.display = /수주/.test(String(d.type || '')) || it.brand ? '' : 'none';
+  };
+  (function() {
+    var auto = it.brand ? '' : itemBrand_(Object.assign({}, it, {
+      brand: ''
+    }));
+    brSel.innerHTML = '';
+    var o0 = el('option', null, '(자동' + (auto ? ' — ' + esc(auto) : '') + ')');
+    o0.value = '';
+    brSel.appendChild(o0);
+    brandList_().forEach(function(b) {
+      var o = el('option', null, esc(b.name));
+      o.value = b.name;
+      brSel.appendChild(o);
+    });
+    if (it.brand && !brandList_().some(function(b) {
+      return b.name === it.brand;
+    })) {
+      var ox = el('option', null, esc(it.brand));
+      ox.value = it.brand;
+      brSel.appendChild(ox);
+    }
+    brSel.value = it.brand || '';
+  })();
   typeChips($('#mType'), S.boot.types, it.type, function(v) {
     d.type = v;
+    showBr();
   });
+  showBr();
   var mg = $('#mTypeMg');
   if (mg) mg.onclick = function(e) {
     e.preventDefault();
     openTypes(function() {
       typeChips($('#mType'), S.boot.types, d.type, function(v) {
         d.type = v;
+        showBr();
       });
     });
   };
@@ -4339,6 +4371,7 @@ function openEdit(it, isNew) {
     it.cust = $('#mCust').value.trim();
     it.end = $('#mEnd').value.trim();
     it.prod = $('#mProd').value.trim();
+    it.brand = $('#mBrand').value;
     it.content = $('#mContent').value.trim();
     it.amount = Number(String($('#mAmt').value).replace(/[^\d.]/g, '')) || 0;
     it.with = wsel.filter(function(p) {
@@ -4447,7 +4480,7 @@ function delQuiet_(x) {
 function saveRun_(it, run, runD, until) {
   var start = it.date, last = until && until > start ? until : start, days = [];
   for (var d = start, n = 0; d <= last && n < 14; d = addDays(d, 1), n++) days.push(d);
-  var F = [ 'type', 'status', 'resolved', 'note', 'person', 'cust', 'end', 'prod', 'content', 'amount', 'with' ], sig = function(x) {
+  var F = [ 'type', 'status', 'resolved', 'note', 'person', 'cust', 'end', 'prod', 'brand', 'content', 'amount', 'with' ], sig = function(x) {
     return JSON.stringify(F.map(function(k) {
       return x[k] == null ? '' : x[k];
     })) + x.date;
@@ -5463,6 +5496,99 @@ function openMergePick_(r) {
   sh.querySelector('#mpX').onclick = close;
 }
 
+function brandList_() {
+  var b = S.report && S.report.sales && S.report.sales.brands || S._brands || BRANDS_DEFAULT;
+  return (b || []).filter(function(x) {
+    return x && x.name && !x.internal && !x.overseas;
+  });
+}
+
+function loadBrands_() {
+  if (S._brands || S._brLoad) return;
+  S._brLoad = 1;
+  gs('wrBrands').then(function(x) {
+    if (x && x.brands) {
+      S._brands = x.brands;
+      if (S.view === 'board') renderBoard();
+    }
+  }, function() {
+    S._brLoad = 0;
+  });
+}
+
+function itemBrand_(i) {
+  if (!i) return '';
+  if (i.brand) return String(i.brand);
+  var BR = brandList_(), p = String(i.prod || '').trim();
+  if (BR.some(function(b) {
+    return b.name === p;
+  })) return p;
+  var mt = function(str, field) {
+    var U = String(str || '').toUpperCase(), hit = '';
+    BR.forEach(function(b) {
+      if (hit) return;
+      if ((b[field] || []).some(function(k) {
+        k = String(k || '').trim().toUpperCase();
+        return k && U.indexOf(k) >= 0;
+      })) hit = b.name;
+    });
+    return hit;
+  };
+  var g = mt(p + ' ' + (i.content || ''), 'items') || mt(p, 'keys');
+  return g && g !== '기타' ? g : '';
+}
+
+function setBrand_(list, v) {
+  var names = brandList_().map(function(b) {
+    return b.name;
+  });
+  (list || []).forEach(function(x) {
+    if (!x) return;
+    var live = (S.items || []).filter(function(y) {
+      return y !== x && x.id && y.id === x.id;
+    })[0];
+    [ x, live ].forEach(function(y) {
+      if (!y) return;
+      y.brand = v;
+      if (!v && names.indexOf(String(y.prod || '').trim()) >= 0) y.prod = '';
+    });
+    save(live || x);
+  });
+}
+
+function brandPick_(span, list) {
+  if (span.querySelector('select')) return;
+  var cur = itemBrand_(list[0]);
+  var sel = el('select');
+  sel.style.cssText = 'font:inherit;max-width:100%';
+  [ '' ].concat(brandList_().map(function(b) {
+    return b.name;
+  })).forEach(function(n) {
+    var o = el('option', null, n || '(빈칸)');
+    o.value = n;
+    if (n === cur) o.selected = true;
+    sel.appendChild(o);
+  });
+  span.innerHTML = '';
+  span.appendChild(sel);
+  sel.focus();
+  var fin = false, done = function() {
+    if (fin) return;
+    fin = true;
+    var v = sel.value;
+    if (v !== cur) {
+      setBrand_(list, v);
+      toast(v ? '브랜드 ' + v + ' 저장' : '브랜드 비움');
+    }
+    renderBoard();
+  };
+  sel.onchange = done;
+  sel.onblur = done;
+  sel.onclick = function(e) {
+    e.stopPropagation();
+  };
+}
+
 function renderMeet_(all, start, k, seen) {
   var types = S.boot.types.slice(), newIds = {};
   k.appendChild(el('div', 'mtitle', '<div style="flex:1;min-width:0"><h2>주간 회의 <span class="hd">' + md(S.period) + ' (' + DOW[dow(S.period)] + ')</span>' + (S.boot && S.boot.current && S.period !== S.boot.current ? ' <span class="tag s-rep" style="vertical-align:middle;font-size:11px">' + (snapOn_() ? '확정본 · ' + esc(snapOn_().finalAt || '') : '지난 회의') + '</span> <a href="#" id="bdBack" style="font-size:13px;font-weight:600">현재 주로 돌아가기</a>' : '') + '</h2><div class="mwhobar"><span class="ml2">참석</span><div id="minWhoBox"><span class="sub">불러오는 중…</span></div></div></div>'));
@@ -5472,6 +5598,7 @@ function renderMeet_(all, start, k, seen) {
     });
     if (isNew) newIds[i.id || i._pk || titleOf(i) + i.date] = 1;
     var cu = r.cust || i.cust, tx = r.txt != null ? r.txt : i.content;
+    var isOrd = !!(sec && sec.full && /수주/.test(sec.full));
     var team = r.ppl && r.ppl.length > 1 && (/전시|행사/.test(sec && sec.full || i.type) || r.all.some(function(x) {
       return x.person !== i.person;
     }));
@@ -5482,9 +5609,17 @@ function renderMeet_(all, start, k, seen) {
     }) : typesOf(i).slice(isIssue(i) ? 0 : 1), range = r.to > i.date;
     var e = el('div', 'ml' + (isIssue(i) ? ' iss' : '') + (isNew ? ' new' : ''), '<span class="md">' + md(i.date) + (range ? '~' + md(r.to).replace(/^\d+\//, function(m) {
       return m.slice(0, 3) === md(i.date).slice(0, 3) ? '' : m;
-    }) : ' ' + DOW[dow(i.date)]) + '</span>' + '<span class="mwho' + (team ? ' mteam' : '') + '">' + (team ? r.ppl.map(esc).join('·<wbr>') : i.person === '팀' && /수주/.test(String(i.type)) ? '<span class="mbr">' + esc(i.prod || '팀') + '</span>' : esc(i.person)) + (w.length ? '<span class="mww"><b>' + withWord(i) + '</b> ' + esc(w.join(', ')) + '</span>' : '') + '</span>' + '<span class="mmain">' + (cu ? '<b>' + esc(cu) + '</b>' + (i.end ? '<span class="sub"> → ' + esc(i.end) + '</span>' : '') + (tx ? '<span class="m2">' + fmtText(tx) + '</span>' : '') : '<span class="m2 mtx">' + fmtText(tx || titleOf(i)) + '</span>') + (isResolved(i) ? ' <span class="tag s-해결 mt">✅ 해결</span>' : '') + (i._carry > 1 ? ' <span class="carry">' + i._carry + '주째</span>' : '') + (isIssue(i) && !isResolved(i) ? ' <button class="rsb" title="이 이슈를 해결로 표시">해결</button>' : '') + (i.note ? '' : ' <button class="nb" title="이 건에 회의 메모 적기">✎ 메모</button>') + noteHtml(i) + '</span>' + '<span class="ma">' + (r.amt || i.amount ? won(r.amt || i.amount) : '') + '</span>');
+    }) : ' ' + DOW[dow(i.date)]) + '</span>' + '<span class="mwho' + (team && !isOrd ? ' mteam' : '') + '">' + (isOrd ? function() {
+      var bn = itemBrand_(i);
+      return '<span class="mbr' + (bn ? '' : ' mbr0') + '" title="눌러서 브랜드 고르기">' + (bn ? esc(bn) : '브랜드?') + '</span>';
+    }() : team ? r.ppl.map(esc).join('·<wbr>') : esc(i.person)) + (w.length ? '<span class="mww"><b>' + withWord(i) + '</b> ' + esc(w.join(', ')) + '</span>' : '') + '</span>' + '<span class="mmain">' + (cu ? '<b>' + esc(cu) + '</b>' + (i.end ? '<span class="sub"> → ' + esc(i.end) + '</span>' : '') + (tx ? '<span class="m2">' + fmtText(tx) + '</span>' : '') : '<span class="m2 mtx">' + fmtText(tx || titleOf(i)) + '</span>') + (isResolved(i) ? ' <span class="tag s-해결 mt">✅ 해결</span>' : '') + (i._carry > 1 ? ' <span class="carry">' + i._carry + '주째</span>' : '') + (isIssue(i) && !isResolved(i) ? ' <button class="rsb" title="이 이슈를 해결로 표시">해결</button>' : '') + (i.note ? '' : ' <button class="nb" title="이 건에 회의 메모 적기">✎ 메모</button>') + noteHtml(i) + '</span>' + '<span class="ma">' + (r.amt || i.amount ? won(r.amt || i.amount) : '') + '</span>');
     e.onclick = function(ev) {
       if (snapOn_()) return;
+      if (ev.target.closest('select')) return;
+      if (isOrd && ev.target.closest('.mbr')) {
+        brandPick_(ev.target.closest('.mbr'), r.all && r.all.length ? r.all : [ i ]);
+        return;
+      }
       if (ev.target.closest('.rsb')) {
         resolveItem(i);
         return;
@@ -7331,26 +7466,8 @@ function renderReport() {
       d.appendChild(freeText('issue_note', '이슈 관련 추가 메모'));
     },
     orders: function(d, sec, lab) {
-      var BR = sl && sl.brands || [];
-      var mt = function(str, field) {
-        var U = String(str || '').toUpperCase(), hit = '';
-        BR.forEach(function(b) {
-          if (hit || b.internal || b.overseas) return;
-          if ((b[field] || []).some(function(k) {
-            k = String(k || '').trim().toUpperCase();
-            return k && U.indexOf(k) >= 0;
-          })) hit = b.name;
-        });
-        return hit;
-      };
-      var brandOf = function(i) {
-        var p = String(i.prod || '').trim();
-        if (BR.some(function(b) {
-          return b.name === p;
-        })) return p;
-        var g = mt(p + ' ' + (i.content || ''), 'items') || mt(p, 'keys');
-        return g && g !== '기타' ? g : '';
-      };
+      var BR = brandList_();
+      var brandOf = itemBrand_;
       var rows = (r.week || []).filter(function(i) {
         return hasType(i, '수주');
       }).slice().sort(function(a, b) {
@@ -7409,13 +7526,8 @@ function renderReport() {
             if (fin) return;
             fin = true;
             var v = sel.value;
-            it.prod = v;
-            var live = (S.items || []).filter(function(x) {
-              return x.id === it.id;
-            })[0];
-            if (live) live.prod = v;
-            save(live || it);
-            td.innerHTML = esc(v) || '<span class="sub">브랜드 고르기</span>';
+            setBrand_([ it ], v);
+            td.innerHTML = esc(itemBrand_(it)) || '<span class="sub">브랜드 고르기</span>';
             toast(v ? '브랜드 ' + v + ' 저장' : '브랜드 비움');
           };
           sel.onchange = done;
