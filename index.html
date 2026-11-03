@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.33 -->
+<!-- 주간보고 화면 v1.35 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.33</title>
+<title>HS TECH 주간보고 v1.35</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -1252,6 +1252,15 @@ if (!window.google) {
     function brandOfRow_(x, custGrp, brands, imap) {
       var byp = brandOf_([ custGrp, x.igrp, x.memo ].join(' '), brands, 'keys', true);
       if (byp) return byp;
+      var ovs = '';
+      brands.forEach(function(b) {
+        if (ovs || !b.overseas) return;
+        if ((b.keys || []).some(function(k) {
+          k = String(k || '').trim().toUpperCase();
+          return k && String(x.memo || '').toUpperCase().indexOf(k) >= 0;
+        })) ovs = b.name;
+      });
+      if (ovs) return ovs;
       if (x.fix && (x.fix === '기타' || brands.some(function(b) {
         return b.name === x.fix;
       }))) return x.fix;
@@ -2698,6 +2707,9 @@ function askWho() {
 }
 
 function backToCurrent() {
+  S._meetFix = null;
+  S.minutes = null;
+  S.snapB = null;
   if (!S.boot || S.period === S.boot.current) return;
   S.period = S.boot.current;
   S.report = null;
@@ -5224,14 +5236,25 @@ function boardMarkSeen() {
   } catch (e) {}
 }
 
+function natP_() {
+  var c = S.boot && S.boot.current;
+  if (!c) return S.period;
+  return todayKst() > c ? addDays(c, 7) : c;
+}
+
+function meetP_() {
+  if (!S.boot || S.period !== S.boot.current || S._meetFix === S.period) return S.period;
+  return natP_();
+}
+
 function loadPastIssues() {
-  var from = addDays(S.period, -56), to = addDays(S.period, -1), key = from + to;
+  var from = addDays(meetP_(), -56), to = addDays(meetP_(), -1), key = from + to;
   if (S._pastIssKey === key) return;
   S._pastIssKey = key;
   S._pastIss = [];
   gs('wrListRange', from, to).then(function(r) {
     if (!r.ok || S._pastIssKey !== key) return;
-    var p0 = addDays(S.period, -7);
+    var p0 = addDays(meetP_(), -7);
     S._pastAll = r.items || [];
     S._pastIss = S._pastAll.filter(function(i) {
       return isIssue(i) && i.date < p0;
@@ -5242,7 +5265,7 @@ function loadPastIssues() {
 }
 
 function weeksAgo(d) {
-  return Math.round((new Date(S.period) - new Date(periodOf(d))) / 864e5 / 7);
+  return Math.round((new Date(meetP_()) - new Date(periodOf(d))) / 864e5 / 7);
 }
 
 function periodOf(d) {
@@ -5251,7 +5274,7 @@ function periodOf(d) {
 }
 
 function snapOn_() {
-  return S.snapB && S.snapB.period === S.period ? S.snapB : null;
+  return S.snapB && S.snapB.period === meetP_() ? S.snapB : null;
 }
 
 function renderBoard() {
@@ -5259,7 +5282,7 @@ function renderBoard() {
     S._boardPending = true;
     return;
   }
-  var start = S.period, end = addDays(start, 6), p0 = addDays(start, -7);
+  var start = meetP_(), end = addDays(start, 6), p0 = addDays(start, -7);
   var sb = snapOn_();
   if (sb) {
     var all = sb.items.filter(function(i) {
@@ -5591,7 +5614,7 @@ function brandPick_(span, list) {
 
 function renderMeet_(all, start, k, seen) {
   var types = S.boot.types.slice(), newIds = {};
-  k.appendChild(el('div', 'mtitle', '<div style="flex:1;min-width:0"><h2>주간 회의 <span class="hd">' + md(S.period) + ' (' + DOW[dow(S.period)] + ')</span>' + (S.boot && S.boot.current && S.period !== S.boot.current ? ' <span class="tag s-rep" style="vertical-align:middle;font-size:11px">' + (snapOn_() ? '확정본 · ' + esc(snapOn_().finalAt || '') : '지난 회의') + '</span> <a href="#" id="bdBack" style="font-size:13px;font-weight:600">현재 주로 돌아가기</a>' : '') + '</h2><div class="mwhobar"><span class="ml2">참석</span><div id="minWhoBox"><span class="sub">불러오는 중…</span></div></div></div>'));
+  k.appendChild(el('div', 'mtitle', '<div style="flex:1;min-width:0"><h2>주간 회의 <span class="hd">' + md(meetP_()) + ' (' + DOW[dow(meetP_())] + ')</span>' + (S.boot && S.boot.current && meetP_() !== natP_() ? ' <span class="tag s-rep" style="vertical-align:middle;font-size:11px">' + (snapOn_() ? '확정본 · ' + esc(snapOn_().finalAt || '') : '지난 회의') + '</span> <a href="#" id="bdBack" style="font-size:13px;font-weight:600">현재 주로 돌아가기</a>' : meetP_() !== S.boot.current ? ' <span class="tag s-예정" style="vertical-align:middle;font-size:11px" title="월요일 회의가 끝나면(화요일 0시) 다음 회의 화면으로 넘어감 — 지난주 칸 = 이번 주 한 일, 금주 칸 = 다음 주 계획. 끝난 회의는 지난 기록에">다음 회의 준비</span>' : '') + '</h2><div class="mwhobar"><span class="ml2">참석</span><div id="minWhoBox"><span class="sub">불러오는 중…</span></div></div></div>'));
   var line = function(r, sec) {
     var i = r.it, isNew = r.all.some(function(x) {
       return seen && x.person !== S.person && String(x.updated || x.created || '') > seen;
@@ -5634,7 +5657,7 @@ function renderMeet_(all, start, k, seen) {
     return e;
   };
   all = all.filter(function(i) {
-    return i.source !== 'MEETING:' + S.period;
+    return i.source !== 'MEETING:' + meetP_();
   });
   var iss = all.filter(isIssue), dir = all.filter(function(i) {
     return !isIssue(i) && (/^MEETING/.test(i.source || '') || primeType(i) === '업무지시');
@@ -5771,11 +5794,11 @@ function noteInline_(row, i) {
 }
 
 function minutesKey_() {
-  return 'wr_min_' + WR_MODE + '_' + S.period;
+  return 'wr_min_' + WR_MODE + '_' + meetP_();
 }
 
 function loadMinutes_() {
-  var p = S.period;
+  var p = meetP_();
   if (S.minutes && S.minutes.period === p) return;
   S.minutes = {
     period: p,
@@ -5786,7 +5809,7 @@ function loadMinutes_() {
     _loading: 1
   };
   gs('wrMinutesGet', p).then(function(r) {
-    if (S.period !== p) return;
+    if (meetP_() !== p) return;
     if (r && r.ok && r.minutes) {
       var sn = r.minutes.snap;
       delete r.minutes.snap;
@@ -5813,7 +5836,7 @@ function loadMinutes_() {
 function actionItems_() {
   var sb = snapOn_();
   return (sb ? sb.items : S.items).filter(function(i) {
-    return i.source === 'MEETING:' + S.period;
+    return i.source === 'MEETING:' + meetP_();
   }).sort(function(a, b) {
     return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
   });
@@ -5835,7 +5858,7 @@ function renderMinutes_() {
   var who = m.attendees || [];
   box.innerHTML = '<div class="mh"><span class="bar txd"></span><span class="ht">업무 지시사항</span></div>' + '<div class="mrow1"><div class="minact"><div class="minadd"><select id="maWho">' + S.boot.people.map(function(p) {
     return '<option' + (p === S.person ? ' selected' : '') + '>' + esc(p) + '</option>';
-  }).join('') + '</select><span class="madr"><input type="date" id="maFrom" value="' + S.period + '"><span class="sub">~</span><input type="date" id="maTo" title="끝 날짜"></span><input id="maText" placeholder="지시사항"><button class="btn sm" id="maAdd">＋ 넣기</button></div><div style="height:6px"></div><div id="minList"></div></div></div>';
+  }).join('') + '</select><span class="madr"><input type="date" id="maFrom" value="' + meetP_() + '"><span class="sub">~</span><input type="date" id="maTo" title="끝 날짜"></span><input id="maText" placeholder="지시사항"><button class="btn sm" id="maAdd">＋ 넣기</button></div><div style="height:6px"></div><div id="minList"></div></div></div>';
   var L = $('#minList'), acts = runsOf_(actionItems_());
   if (!acts.length) L.appendChild(el('div', 'sub mnone2', '아직 없음'));
   acts.forEach(function(r) {
@@ -5868,7 +5891,7 @@ function renderMinutes_() {
       $('#maText').focus();
       return;
     }
-    var f0 = $('#maFrom').value || S.period, t0 = $('#maTo').value;
+    var f0 = $('#maFrom').value || meetP_(), t0 = $('#maTo').value;
     var sel = {
       from: f0,
       to: t0 > f0 ? t0 : ''
@@ -5891,7 +5914,7 @@ function renderMinutes_() {
         prod: '',
         content: t,
         status: '',
-        source: 'MEETING:' + S.period
+        source: 'MEETING:' + meetP_()
       };
       S.items.push(it);
       save(it);
@@ -5922,7 +5945,7 @@ function minSaveNow_(manual) {
   if (!m || m._ro) return;
   clearTimeout(S._minT);
   var o = {
-    period: m.period || S.period,
+    period: m.period || meetP_(),
     attendees: m.attendees || [],
     decisions: m.decisions || '',
     savedBy: S.person || ''
@@ -6155,6 +6178,7 @@ document.addEventListener('click', function(e) {
   if (e.target.closest('#bdBack')) {
     e.preventDefault();
     minFlush_();
+    S._meetFix = null;
     S.period = S.boot.current;
     S.report = null;
     S.minutes = null;
@@ -8831,6 +8855,7 @@ function drawMinutesList_() {
   });
   var back = el('div', 'hist', '<div class="sub">현재 기간으로 돌아가기</div><span>→</span>');
   back.onclick = function() {
+    S._meetFix = null;
     S.period = S.boot.current;
     S.report = null;
     S.boot.closed = false;
@@ -8849,6 +8874,7 @@ function drawMinutesList_() {
 function viewPastBoard_(period) {
   minFlush_();
   S._keepPast = true;
+  S._meetFix = period;
   S.period = period;
   S.report = null;
   S.minutes = null;
@@ -8911,6 +8937,7 @@ function drawHistory(list) {
   });
   var back = el('div', 'hist', '<div class="sub">현재 기간으로 돌아가기</div><span>→</span>');
   back.onclick = function() {
+    S._meetFix = null;
     S.period = S.boot.current;
     S.report = null;
     S.boot.closed = false;
