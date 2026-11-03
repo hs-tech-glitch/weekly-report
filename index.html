@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.35 -->
+<!-- 주간보고 화면 v1.36 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.35</title>
+<title>HS TECH 주간보고 v1.36</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -5707,7 +5707,8 @@ function renderMeet_(all, start, k, seen) {
     }), cw = sec.items.filter(function(i) {
       return i.date >= start;
     });
-    [ [ '지난주', pw ], [ '금주', cw ] ].forEach(function(g) {
+    var wkL = S.boot && meetP_() !== S.period && todayKst() <= addDays(S.boot.current, 4) ? [ '금주', '다음주' ] : [ '지난주', '금주' ];
+    [ [ wkL[0], pw ], [ wkL[1], cw ] ].forEach(function(g) {
       if (!g[1].length) return;
       var sub = el('div', 'msub');
       sub.appendChild(el('div', 'mwk', g[0]));
