@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.41 -->
+<!-- 주간보고 화면 v1.42 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.41</title>
+<title>HS TECH 주간보고 v1.42</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -386,6 +386,8 @@ table.rep.sgt tr.sgoth td{color:#777}table.rep.sgt tr.sgtot td{border-top:2px so
 .sgbar{height:14px;background:var(--navy);border-radius:2px;position:relative;overflow:hidden;min-width:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sgbar.oth{background:#b8c0cc}
 .sgbar i{position:absolute;right:0;top:0;bottom:0;background:repeating-linear-gradient(135deg,#9db4d6 0 3px,#c9d6ea 3px 6px)}
 .sgbusy{font-weight:500;font-size:11.5px;color:#92400e;background:#fff4d6;border-radius:9px;padding:1px 8px;margin-left:6px}
+.sgb2{position:relative;height:14px}.sgb2 span{position:absolute;left:0;top:0;bottom:0;border-radius:2px;min-width:1px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sgb2 .f{background:#b9c8e0}.sgb2 .a{background:var(--navy);top:3px;bottom:3px}.sgb2.oth .f{background:#dde1e7}.sgb2.oth .a{background:#9aa3b0}
+.sglg{font-size:11.5px;color:#555;display:inline-flex;align-items:center;gap:5px;margin-left:6px}.sglg i{display:inline-block;width:14px;height:8px;border-radius:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sglg i.a{background:var(--navy)}.sglg i.f{background:#b9c8e0;margin-left:6px}
 .sgnote{font-size:11px;color:#666;line-height:1.55;margin-top:8px}.sgrec{font-size:12px;color:#333;margin-top:8px;padding:6px 10px;background:#f6f8fb;border-left:3px solid var(--navy);-webkit-print-color-adjust:exact;print-color-adjust:exact}.sgrec b{color:#111}
 .sgoff{margin:12px auto 0;max-width:900px;font-size:12.5px;color:var(--sub);display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px dashed var(--line);border-radius:8px}
 .sgfix{margin-top:14px;border:1px solid #d7dde6;border-radius:8px;background:#f8fafc;padding:8px 12px;font-size:12.5px}.sgfix summary{cursor:pointer;font-weight:700;color:var(--navy)}
@@ -1734,86 +1736,20 @@ if (!window.google) {
       };
     }
     function segDemo() {
-      var C = [ [ '삼성전자', 152e7, {
-        '반도체': 152e7
-      }, 'badge' ], [ '아이마켓코리아', 468e6, {
-        '반도체': 388e6,
-        '자동차': 8e7
-      }, 'po' ], [ '에스케이하이닉스', 61e7, {
-        '반도체': 61e7
-      }, 'badge' ], [ '엠지코리아', 81e6, {
-        '장비': 81e6
-      }, 'badge' ], [ '우희랩시스템', 1297e5, {
-        '기타': 1297e5
-      }, 'etc' ], [ '세미트론', 77e6, {
-        '기타': 77e6
-      }, 'etc' ], [ '현대계장', 62e6, {
-        '반도체': 62e6
-      }, 'hist' ], [ '창성', 258e5, {
-        '기타': 258e5
-      }, 'etc' ], [ '현대자동차 의왕연구소', 249e5, {
-        '자동차': 249e5
-      }, 'name' ], [ '에코프로비엠', 15e7, {
-        '이차전지': 15e7
-      }, 'badge' ], [ '한국항공우주연구원', 6e7, {
-        '연구·공공': 6e7
-      }, 'badge' ], [ '지티피에스', 9e7, {
-        'HVAC': 9e7
-      }, 'badge' ] ];
-      var rules = db.segfix || [], agg = {}, how = {}, tot = 0, custs = [];
-      C.forEach(function(c) {
-        var by = c[2], hw = c[3], r = rules.filter(function(q) {
-          return q.cust === c[0];
-        })[0];
-        if (r && (hw === 'etc' || hw === 'hist' || hw === 'badge')) {
-          by = {};
-          by[r.seg] = c[1];
-          hw = 'fix';
-        }
-        var hh = {};
-        hh[hw] = c[1];
-        var hs = {};
-        hs[hw] = JSON.parse(JSON.stringify(by));
-        custs.push({
-          cust: c[0],
-          amt: c[1],
-          by,
-          how: hh,
-          hs
-        });
-        tot += c[1];
-        how[hw] = (how[hw] || 0) + c[1];
-        Object.keys(by).forEach(function(k) {
-          var g = agg[k] = agg[k] || {
-            seg: k,
-            amt: 0,
-            est: 0,
-            n: 0
-          };
-          g.amt += by[k];
-          g.n++;
-          if (hw === 'hist') g.est += by[k];
-        });
-      });
-      var rows = Object.keys(agg).map(function(k) {
-        return agg[k];
-      }).sort(function(a, b) {
-        if (a.seg === '기타') return 1;
-        if (b.seg === '기타') return -1;
-        return b.amt - a.amt;
-      });
+      var R = [ [ '반도체', 51.2, 56, 78 ], [ '데이터센터', 3.7, 8.2, 7 ], [ '이차전지', 9.3, 7, 16 ], [ '선박', 5.9, 4.4, 7 ], [ '소재', 5.8, 4.3, 12 ], [ '자동차', 3.5, 3.9, 13 ], [ '수소', 4.8, 3.6, 5 ], [ '장비', 3, 2.2, 11 ], [ 'HVAC', 3, 2.2, 19 ], [ '연구·공공', 2.9, 2.2, 18 ], [ '기타', 7, 6, 49 ] ];
       return {
         year: P.slice(0, 4),
-        cut: addDays(P, 4),
-        total: tot,
-        rows,
-        how,
-        custs: custs.sort(function(a, b) {
-          return b.amt - a.amt;
-        }),
-        rules,
-        opts: [ 'HVAC', '데이터센터', '반도체', '선박', '소재', '연구·공공', '이차전지', '자동차', '장비', '바이오', '농업' ],
-        at: now()
+        stamp: now(),
+        n: 235,
+        at: now(),
+        rows: R.map(function(x) {
+          return {
+            seg: x[0],
+            act: x[1],
+            fc: x[2],
+            n: x[3]
+          };
+        })
       };
     }
     var api = {
@@ -2123,23 +2059,6 @@ if (!window.google) {
         return {
           ok: true,
           segs: segDemo()
-        };
-      },
-      wrSegFix: function(p, c, m, g) {
-        db.segfix = (db.segfix || []).filter(function(x) {
-          return !(x.cust === c && x.model === (m || '').toUpperCase());
-        });
-        if (g) db.segfix.push({
-          cust: c,
-          model: (m || '').toUpperCase(),
-          seg: g,
-          memo: '',
-          at: now()
-        });
-        sv();
-        return {
-          ok: true,
-          rules: db.segfix
         };
       },
       wrSaveBrands: function(l) {
@@ -4120,7 +4039,7 @@ function openPreview() {
     c2.style.transform = 'scale(' + z2 * sc + ')';
     in2.appendChild(c2);
     wrap.appendChild(p2);
-    bar.querySelector('b:last-of-type').insertAdjacentHTML('afterend', ' + <b>Segment별 매출 1장</b>');
+    bar.querySelector('b:last-of-type').insertAdjacentHTML('afterend', ' + <b>Segment별 비중 1장</b>');
   }
   wrap.onclick = function(e) {
     if (e.target === wrap) wrap.remove();
@@ -7916,33 +7835,15 @@ function renderReport() {
   }
 }
 
-var SEG_STD = [ '반도체', '디스플레이', '이차전지', '수소', '데이터센터', '자동차', '로봇', '선박', 'HVAC', '바이오', '연구·공공', '장비', '소재', '화학', '압축공기', '농업', '방산', '발전소' ];
-
-var SEG_HOW_L = {
-  fix: '보정',
-  badge: '고객 배지',
-  po: 'PO 엔드유저',
-  hist: '추정(최근 1년 PO)',
-  name: '이름',
-  etc: '못 찾음'
-};
-
-function segM_(v) {
-  return (Math.round((Number(v) || 0) / 1e5) / 10).toLocaleString(undefined, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  });
-}
-
-function segPct_(v, t) {
-  return t ? (Math.round(v / t * 1e3) / 10).toFixed(1) + '%' : '-';
+function segP_(v) {
+  return (Number(v) || 0).toFixed(1) + '%';
 }
 
 function segPage_(r, canEdit, frozen) {
   var N = r.notes || {};
   if (N.segOff) {
     if (!canEdit) return null;
-    var off = el('div', 'sgoff noprint', 'Segment별 매출 페이지 꺼짐 — 인쇄·미리보기에 안 나옵니다 ');
+    var off = el('div', 'sgoff noprint', 'Segment별 비중 페이지 꺼짐 — 인쇄·미리보기에 안 나옵니다 ');
     var bOn = el('button', 'btn sm', '다시 켜기');
     bOn.onclick = function() {
       delete N.segOff;
@@ -7952,7 +7853,7 @@ function segPage_(r, canEdit, frozen) {
     off.appendChild(bOn);
     return off;
   }
-  if (frozen && !r.segs) return null;
+  if (frozen && !(r.segs && r.segs.rows && r.segs.rows.length && r.segs.rows[0].fc !== undefined)) return null;
   var d = el('div', 'doc doc2');
   d.id = 'segDoc';
   var draw = function(sg) {
@@ -7964,15 +7865,18 @@ function segPage_(r, canEdit, frozen) {
     return d;
   }
   var c = S._seg;
-  if (c && c.p === r.period && Date.now() - c.t < 3e5) {
+  if (c && c.p === r.period && Date.now() - c.t < 3e5 && c.v && c.v.rows && (!c.v.rows[0] || c.v.rows[0].fc !== undefined)) {
     draw(c.v);
     return d;
   }
-  d.innerHTML = '<div class="ttl">Segment별 매출</div><div class="sub" style="padding:18px 0">불러오는 중… (판매 자료 · PO · 고객사 배지를 맞춰 보는 중)</div>';
+  d.innerHTML = '<div class="ttl">Segment별 비중</div><div class="sub" style="padding:18px 0">불러오는 중…</div>';
+  var fail = function(m) {
+    d.innerHTML = '<div class="ttl">Segment별 비중</div><div class="sub noprint" style="padding:12px 0;color:var(--bad)">불러오지 못했습니다: ' + esc(m || '') + '</div>';
+    d.classList.add('sgfail');
+  };
   gs('wrSegSales', r.period).then(function(x) {
     if (!x || !x.ok) {
-      d.innerHTML = '<div class="ttl">Segment별 매출</div><div class="sub noprint" style="padding:12px 0;color:var(--bad)">불러오지 못했습니다: ' + esc(x && x.msg || '') + '</div>';
-      d.classList.add('sgfail');
+      fail(x && x.msg);
       return;
     }
     S._seg = {
@@ -7982,239 +7886,49 @@ function segPage_(r, canEdit, frozen) {
     };
     if (document.body.contains(d)) draw(x.segs);
   }).catch(function(e) {
-    d.innerHTML = '<div class="ttl">Segment별 매출</div><div class="sub noprint" style="padding:12px 0;color:var(--bad)">불러오지 못했습니다: ' + esc(e && e.message || e) + '</div>';
-    d.classList.add('sgfail');
+    fail(e && e.message || e);
   });
   return d;
 }
 
 function segDraw_(d, sg, r, canEdit, frozen) {
   if (!sg || !sg.rows || !sg.rows.length) {
-    d.innerHTML = '<div class="ttl">Segment별 매출</div><div class="sub" style="padding:14px 0">' + (sg && sg.year ? sg.year + '년 ' : '') + '판매 자료가 없습니다. ⬆ ERP 매출 올리기 뒤에 나옵니다.</div>';
+    d.innerHTML = '<div class="ttl">Segment별 비중</div><div class="sub" style="padding:14px 0">파이프라인 Segment 자료가 없습니다.</div>';
     d.classList.add('sgfail');
     return;
   }
   d.classList.remove('sgfail');
-  var tot = sg.total || 0, max = 0, estT = 0;
+  var ry = String(r.period || '').slice(0, 4), yr = sg.year || ry, max = 0;
   sg.rows.forEach(function(x) {
-    if (x.amt > max) max = x.amt;
-    estT += x.est || 0;
+    max = Math.max(max, x.act || 0, x.fc || 0);
   });
-  var cut = String(sg.cut || ''), rng = cut ? +cut.slice(5, 7) + '/' + +cut.slice(8, 10) : '';
-  d.innerHTML = '<div class="ttl">Segment별 매출 <span class="sgsub">' + esc(sg.year) + '년 1/1~' + rng + ' 누계 · 실매출(이카운트 판매) · 단위 백만원</span></div>';
+  d.innerHTML = '<div class="ttl">Segment별 비중 <span class="sgsub">' + esc(yr) + '년 프로젝트 파이프라인 · 실적(바이살라 PO) / 연간 전망(실적 + 남은 예상 × 확률)</span></div>';
+  if (yr && ry && yr !== ry) d.appendChild(el('div', 'sub noprint', '⚠ 파이프라인 종합의 연도가 ' + esc(yr) + '년으로 되어 있습니다(보고서는 ' + esc(ry) + '년) — 파이프라인 종합 B2 칸에서 연도를 바꾸면 맞춰집니다')).style.cssText = 'color:var(--bad);font-size:12px;margin:-4px 0 8px';
   var k = el('div', 'kpi sgk');
-  k.innerHTML = '<span class="kl">합계</span><span class="kc"><b>' + segM_(tot) + '</b>백만원</span><span class="kc"><b>' + sg.rows.filter(function(x) {
+  k.innerHTML = '<span class="kc"><b>' + sg.rows.filter(function(x) {
     return x.seg !== '기타';
-  }).length + '</b>개 분야</span>';
+  }).length + '</b>개 분야</span><span class="kc"><b>' + (sg.n || 0) + '</b>건</span><span class="sglg"><i class="a"></i>실적 비중 <i class="f"></i>연간 전망 비중</span>';
   d.appendChild(k);
   var t = el('table', 'rep sgt');
-  t.innerHTML = '<colgroup><col style="width:18%"><col style="width:15%"><col style="width:11%"><col></colgroup><thead><tr><th>Segment</th><th>누계 (백만원)</th><th>비중</th><th>매출 비교</th></tr></thead>';
+  t.innerHTML = '<colgroup><col style="width:17%"><col style="width:12%"><col style="width:13%"><col><col style="width:8%"></colgroup><thead><tr><th>Segment</th><th>실적 비중</th><th>연간 전망 비중</th><th>비교</th><th>건수</th></tr></thead>';
   var tb = el('tbody');
   sg.rows.forEach(function(x) {
-    var w = max > 0 ? Math.max(0, x.amt / max * 100) : 0, oth = x.seg === '기타';
+    var oth = x.seg === '기타', wa = max > 0 ? x.act / max * 100 : 0, wf = max > 0 ? x.fc / max * 100 : 0;
     var tr = el('tr', oth ? 'sgoth' : '');
-    tr.innerHTML = '<td class="sgn">' + esc(x.seg) + '</td><td class="num">' + segM_(x.amt) + '</td><td class="num">' + segPct_(x.amt, tot) + '</td><td><div class="sgbar' + (oth ? ' oth' : '') + '" style="width:' + w.toFixed(1) + '%"></div></td>';
+    tr.innerHTML = '<td class="sgn">' + esc(x.seg) + '</td><td class="num">' + segP_(x.act) + '</td><td class="num">' + segP_(x.fc) + '</td><td><div class="sgb2' + (oth ? ' oth' : '') + '"><span class="f" style="width:' + wf.toFixed(1) + '%"></span><span class="a" style="width:' + wa.toFixed(1) + '%"></span></div></td><td class="num">' + (x.n || 0) + '</td>';
     tb.appendChild(tr);
   });
   var tr2 = el('tr', 'sgtot');
-  tr2.innerHTML = '<td class="sgn">합계</td><td class="num">' + segM_(tot) + '</td><td class="num">100.0%</td><td></td>';
+  tr2.innerHTML = '<td class="sgn">합계</td><td class="num">100.0%</td><td class="num">100.0%</td><td></td><td class="num">' + (sg.n || 0) + '</td>';
   tb.appendChild(tr2);
   t.appendChild(tb);
   d.appendChild(t);
-  (function() {
-    var sl = r.sales;
-    if (!sl || !sl.rows) return;
-    var isSub = function(g) {
-      return !!(g.internal || g.overseas || /그린피아/.test(g.name));
-    };
-    var L = sl.rows.filter(function(x) {
-      return x.total;
-    }), grand = L.reduce(function(a, x) {
-      return a + x.total;
-    }, 0), subs = L.filter(isSub).sort(function(a, b) {
-      return (a.overseas ? 1 : 0) - (b.overseas ? 1 : 0);
-    });
-    if (!grand) return;
-    var rec = el('div', 'sgrec');
-    rec.innerHTML = '매출 현황 매출합계 <b>' + segM_(grand) + '</b>' + subs.map(function(g) {
-      return ' − ' + esc(g.name) + ' ' + segM_(g.total);
-    }).join('') + ' = Segment 합계 <b>' + segM_(tot) + '</b> <span class="sub">(백만원' + function() {
-      var q = function(v) {
-        return Math.round(v / 1e5);
-      };
-      var df = q(grand) - subs.reduce(function(x, g) {
-        return x + q(g.total);
-      }, 0) - q(tot);
-      return df ? ' · 반올림 차이 ' + (Math.abs(df) / 10).toFixed(1) : '';
-    }() + ')</span>';
-    d.appendChild(rec);
-  })();
-  d.appendChild(el('div', 'sgnote', '실매출(이카운트 판매) 기준 · 거래처 업종(고객사 구분)과 바이살라 PO의 엔드유저로 분야 구분 · 바이패스(그린피아)·해외현장 매출 제외'));
-  if (!frozen) segFixPanel_(d, sg, r, canEdit);
-}
-
-function segNk_(v) {
-  return String(v || '').toLowerCase().replace(/\(주\)|㈜|주식회사|\(유\)|유한회사/g, '').replace(/[\s\(\)\[\]\.,\-_\/'"’]/g, '');
-}
-
-function segApplyLocal_(sg0, cust, model, seg) {
-  var sg = JSON.parse(JSON.stringify(sg0 || {}));
-  var ck = segNk_(cust), md = String(model || '').trim().toUpperCase();
-  sg.rules = (sg.rules || []).filter(function(q) {
-    return !(segNk_(q.cust) === ck && String(q.model || '').toUpperCase() === md);
-  });
-  if (seg) sg.rules.push({
-    cust,
-    model: md,
-    seg,
-    memo: S.person || '',
-    at: '방금'
-  });
-  if (!seg || md) return sg;
-  var c = (sg.custs || []).filter(function(x) {
-    return segNk_(x.cust) === ck;
-  })[0];
-  if (!c || !c.hs) return sg;
-  var rows = {};
-  (sg.rows || []).forEach(function(x) {
-    rows[x.seg] = x;
-  });
-  var mv = 0;
-  sg.how = sg.how || {};
-  Object.keys(c.hs).forEach(function(h) {
-    if (h === 'po') return;
-    Object.keys(c.hs[h]).forEach(function(s2) {
-      var a = c.hs[h][s2];
-      mv += a;
-      var rw = rows[s2];
-      if (rw) {
-        rw.amt -= a;
-        if (h === 'hist') rw.est = Math.max(0, (rw.est || 0) - a);
-      }
-      c.by[s2] = (c.by[s2] || 0) - a;
-      if (Math.abs(c.by[s2]) < 1) delete c.by[s2];
-    });
-    sg.how[h] = (sg.how[h] || 0) - (c.how[h] || 0);
-    delete c.how[h];
-    delete c.hs[h];
-  });
-  if (!mv) return sg;
-  c.hs.fix = {};
-  c.hs.fix[seg] = mv;
-  c.how.fix = mv;
-  c.by[seg] = (c.by[seg] || 0) + mv;
-  sg.how.fix = (sg.how.fix || 0) + mv;
-  if (!rows[seg]) {
-    rows[seg] = {
-      seg,
-      amt: 0,
-      est: 0,
-      n: 0
-    };
-    sg.rows.push(rows[seg]);
-  }
-  rows[seg].amt += mv;
-  sg.rows = sg.rows.filter(function(x) {
-    return Math.abs(x.amt) >= 1;
-  }).sort(function(a, b) {
-    if (a.seg === '기타') return 1;
-    if (b.seg === '기타') return -1;
-    return b.amt - a.amt;
-  });
-  if ((sg.opts || []).indexOf(seg) < 0 && seg !== '기타') (sg.opts = sg.opts || []).push(seg);
-  return sg;
-}
-
-function segRedraw_(r, canEdit) {
-  var dd = document.getElementById('segDoc');
-  if (!dd || !S._seg) return;
-  var l = dd.querySelector('.sgl'), st = l ? l.scrollTop : 0;
-  dd.innerHTML = '';
-  segDraw_(dd, S._seg.v, r, canEdit, false);
-  var l2 = dd.querySelector('.sgl');
-  if (l2) l2.scrollTop = st;
-}
-
-function segRefresh_(r, canEdit, ms) {
-  clearTimeout(S._segT);
-  S._segT = setTimeout(function() {
-    if (S._segSaving > 0) {
-      segRefresh_(r, canEdit, 1500);
-      return;
-    }
-    var tok = S._segTok = (S._segTok || 0) + 1;
-    gs('wrSegSales', r.period).then(function(x) {
-      if (tok !== S._segTok || S._segSaving > 0) return;
-      if (x && x.ok) {
-        S._seg = {
-          p: r.period,
-          t: Date.now(),
-          v: x.segs
-        };
-        segRedraw_(r, canEdit);
-      } else if (S._seg) toast('다시 계산을 못 받았습니다 — 새로고침하면 맞춰집니다');
-    }).catch(function() {});
-  }, ms || 0);
-}
-
-function segFixPanel_(d, sg, r, canEdit) {
-  var all = (sg.custs || []).map(function(c) {
-    var h = c.how || {}, chk = (h.etc || 0) + (h.hist || 0);
-    return {
-      c,
-      chk
-    };
-  });
-  var need = all.filter(function(x) {
-    return x.chk > 0;
-  }).sort(function(a, b) {
-    return b.chk - a.chk;
-  });
-  var box = el('details', 'sgfix noprint');
-  if (need.length) box.open = !!S._segOpen;
-  box.ontoggle = function() {
-    S._segOpen = box.open;
-  };
-  box.innerHTML = '<summary>✏ Segment 보정 — 기타·추정 거래처 <b>' + need.length + '</b>곳' + (sg.rules && sg.rules.length ? ' · 보정 규칙 ' + sg.rules.length + '개' : '') + (S._seg && S._seg.dirty ? ' <span class="sgbusy">저장됨 · 전체 다시 계산 중…</span>' : '') + '</summary>';
-  var how = sg.how || {}, hk = [ 'badge', 'po', 'fix', 'hist', 'name', 'etc' ].filter(function(h) {
-    return how[h];
-  });
-  box.appendChild(el('div', 'sub sgtip', '분류 근거: ' + hk.map(function(h) {
-    return '<span class="sgh h-' + h + '">' + esc(SEG_HOW_L[h]) + ' ' + segPct_(how[h], sg.total || 0) + '</span>';
-  }).join(' ') + '<br>순서: ① 업종이 정해진 고객은 고객사 배지 ② 리셀러·종합·공사는 판매 건마다 같은 모델의 바이살라 PO(판매 전 150일 안) 엔드유저 ③ PO가 없으면 보정한 분야 → 최근 1년 PO로 추정 ④ 못 찾으면 기타. 매번 새로 계산' + (sg.at ? ' · 계산 ' + esc(sg.at) : '')));
-  var tip = el('div', 'sub sgtip', '거래처만 고르면: 업종 고객은 배지 대신 이 분야, 리셀러는 <b>PO 엔드유저를 먼저</b> 보고 PO가 없는 판매에만 이 분야. 모델(예: HMT330)까지 적으면 그 모델은 항상 이 분야. 저장하면 모든 사람 보고서에 바로 반영.');
-  box.appendChild(tip);
-  var ctl = el('div', 'row sgctl');
-  var mode = S._segAll ? 'all' : 'need';
-  var bN = el('button', 'btn sm' + (mode === 'need' ? ' on' : ''), '기타·추정만');
-  var bA = el('button', 'btn sm' + (mode === 'all' ? ' on' : ''), '전체 거래처');
-  var q = el('input');
-  q.type = 'search';
-  q.placeholder = '거래처 찾기';
-  q.className = 'sgq';
-  bN.onclick = function() {
-    S._segAll = false;
-    bN.classList.add('on');
-    bA.classList.remove('on');
-    list();
-  };
-  bA.onclick = function() {
-    S._segAll = true;
-    bA.classList.add('on');
-    bN.classList.remove('on');
-    list();
-  };
-  q.value = S._segQ || '';
-  q.oninput = function() {
-    S._segQ = q.value;
-    list();
-  };
-  ctl.appendChild(bN);
-  ctl.appendChild(bA);
-  ctl.appendChild(q);
-  if (canEdit) {
+  d.appendChild(el('div', 'sgnote', '파이프라인 종합(바이살라 PO 실적 + 담당자 예상 건) Segment 합계표 기준 · 비중만 표시' + (sg.stamp ? ' · 파이프라인 갱신 ' + esc(sg.stamp) : '')));
+  if (!frozen && canEdit) {
+    var ctl = el('div', 'row noprint');
+    ctl.style.cssText = 'gap:8px;margin-top:10px;align-items:center';
+    ctl.appendChild(el('span', 'sub', '분야가 틀린 건은 파이프라인 종합의 \'PO 보정\' 탭에서 바로잡으면 15분 안에 여기도 바뀝니다.')).style.fontSize = '11.5px';
     var bOff = el('button', 'btn sm', '이 페이지 인쇄 안 함');
-    bOff.title = '이번 주 보고서에서 Segment별 매출 페이지를 뺍니다(다시 켤 수 있음)';
     bOff.style.marginLeft = 'auto';
     bOff.onclick = function() {
       (r.notes = r.notes || {}).segOff = 1;
@@ -8222,136 +7936,8 @@ function segFixPanel_(d, sg, r, canEdit) {
       renderReport();
     };
     ctl.appendChild(bOff);
+    d.appendChild(ctl);
   }
-  box.appendChild(ctl);
-  var wrap = el('div', 'sgl');
-  box.appendChild(wrap);
-  var opts = [];
-  SEG_STD.concat((sg.rows || []).map(function(x) {
-    return x.seg;
-  }), (sg.rules || []).map(function(x) {
-    return x.seg;
-  })).forEach(function(o) {
-    if (o && o !== '기타' && opts.indexOf(o) < 0) opts.push(o);
-  });
-  opts.sort(function(a, b) {
-    return a.localeCompare(b, 'ko');
-  });
-  opts.push('기타');
-  var save = function(cust, model, seg, btn) {
-    var cur = S._seg && S._seg.p === r.period ? S._seg.v : sg;
-    S._seg = {
-      p: r.period,
-      t: Date.now(),
-      v: segApplyLocal_(cur, cust, model, seg),
-      dirty: true
-    };
-    S._segOpen = true;
-    S._segTok = (S._segTok || 0) + 1;
-    S._segSaving = (S._segSaving || 0) + 1;
-    segRedraw_(r, canEdit);
-    toast(seg ? cust + (model ? ' · ' + model : '') + ' → ' + seg + ' 저장' : '보정 지움');
-    gs('wrSegFix', r.period, cust, model, seg, S.person).then(function(x) {
-      S._segSaving--;
-      if (!x || !x.ok) {
-        toast('저장 실패: ' + (x && x.msg || ''));
-        segRefresh_(r, canEdit, 0);
-        return;
-      }
-      segRefresh_(r, canEdit, 2500);
-    }).catch(function(e) {
-      S._segSaving--;
-      toast('저장 실패: ' + (e && e.message || e));
-      segRefresh_(r, canEdit, 0);
-    });
-  };
-  function list() {
-    wrap.innerHTML = '';
-    var qq = String(q.value || '').replace(/\s/g, '').toLowerCase();
-    var src = (S._segAll ? all.slice().sort(function(a, b) {
-      return b.c.amt - a.c.amt;
-    }) : need).filter(function(x) {
-      return !qq || String(x.c.cust).replace(/\s/g, '').toLowerCase().indexOf(qq) >= 0;
-    }).slice(0, S._segAll ? 120 : 60);
-    if (!src.length) {
-      wrap.appendChild(el('div', 'sub', '(해당 거래처 없음)')).style.padding = '8px 2px';
-    } else {
-      var t = el('table', 'sgft');
-      t.innerHTML = '<thead><tr><th>거래처</th><th>누계</th><th>지금 분류</th><th>근거</th><th>바꿀 Segment</th><th>모델(선택)</th><th></th></tr></thead>';
-      var tb = el('tbody');
-      src.forEach(function(x) {
-        var c = x.c, by = c.by || {}, hw = c.how || {};
-        var cur = Object.keys(by).sort(function(a, b) {
-          return by[b] - by[a];
-        }).map(function(s) {
-          return esc(s) + (Object.keys(by).length > 1 ? ' <span class="sub">' + segPct_(by[s], c.amt) + '</span>' : '');
-        }).join(' · ');
-        var hs = Object.keys(hw).sort(function(a, b) {
-          return hw[b] - hw[a];
-        }).map(function(h) {
-          return '<span class="sgh h-' + h + '">' + esc(SEG_HOW_L[h] || h) + '</span>';
-        }).join(' ');
-        var tr = el('tr');
-        tr.innerHTML = '<td>' + esc(c.cust) + '</td><td class="num">' + segM_(c.amt) + '</td><td>' + cur + '</td><td>' + hs + '</td><td></td><td></td><td></td>';
-        var sel = el('select');
-        sel.appendChild(el('option', null, '(고르기)')).value = '';
-        opts.concat([ '＋ 직접 입력…' ]).forEach(function(o) {
-          var op = el('option', null, esc(o));
-          op.value = o;
-          sel.appendChild(op);
-        });
-        var md = el('input');
-        md.type = 'text';
-        md.placeholder = '전체';
-        md.className = 'sgm';
-        var bs = el('button', 'btn sm pri', '저장');
-        sel.onchange = function() {
-          if (sel.value !== '＋ 직접 입력…') return;
-          var nv = String(prompt('새 Segment 이름 (예: 디스플레이)') || '').trim();
-          if (!nv) {
-            sel.value = '';
-            return;
-          }
-          var op = el('option', null, esc(nv));
-          op.value = nv;
-          sel.insertBefore(op, sel.lastChild);
-          sel.value = nv;
-        };
-        bs.onclick = function() {
-          if (!sel.value || sel.value === '＋ 직접 입력…') {
-            toast('Segment를 고르세요');
-            sel.focus();
-            return;
-          }
-          save(c.cust, String(md.value || '').trim(), sel.value, bs);
-        };
-        tr.children[4].appendChild(sel);
-        tr.children[5].appendChild(md);
-        tr.children[6].appendChild(bs);
-        tb.appendChild(tr);
-      });
-      t.appendChild(tb);
-      wrap.appendChild(t);
-    }
-    if (sg.rules && sg.rules.length) {
-      var rl = el('div', 'sgrules', '<span class="lt">보정 규칙</span>');
-      sg.rules.forEach(function(q2) {
-        var ch = el('span', 'sgr', esc(q2.cust) + (q2.model ? ' · ' + esc(q2.model) : '') + ' → <b>' + esc(q2.seg) + '</b>');
-        ch.title = (q2.memo ? q2.memo + ' · ' : '') + (q2.at || '');
-        var x = el('button', null, '✕');
-        x.title = '이 규칙 지우기';
-        x.onclick = function() {
-          if (!confirm(q2.cust + (q2.model ? ' · ' + q2.model : '') + ' → ' + q2.seg + ' 보정을 지울까요?')) return;
-          save(q2.cust, q2.model, '', null);
-        };
-        ch.appendChild(x);
-        rl.appendChild(ch);
-      });
-      wrap.appendChild(rl);
-    }
-  }
-  list();
-  d.appendChild(box);
 }
 
 function openPastPicker() {
