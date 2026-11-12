@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.43 -->
+<!-- 주간보고 화면 v1.44 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.43</title>
+<title>HS TECH 주간보고 v1.44</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -296,6 +296,7 @@ details.oth table{margin-top:8px}
 .bsep{border-top:1.5px solid #94a3b8;margin:7px 0 6px}.doc.cp .bsep{margin:2px 0 2px;border-top-width:1px}.bars .seg.buy{background:#c9a27a;-webkit-print-color-adjust:exact;print-color-adjust:exact}.bars .br.buyr .bn{color:#8a5a2b;font-weight:400}.bars .br.buyr{cursor:pointer;border-radius:4px}.bars .br.buyr:hover{background:#fdf6ee}.doc.cp .bars .br.buyr{font-size:9px}.doc.cp .bars .br.buyr .bt{height:6px}.bars .br.buyr .bv b{color:#8a5a2b}table.rep.sales tr.buyr td{color:#8a5a2b;background:#fdf8f2;-webkit-print-color-adjust:exact;print-color-adjust:exact}table.rep.sales tr.buyr td.bh{font-weight:400;padding-left:12px}.ovs table.ovt{margin-top:4px}.ovg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ovg label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--sub)}.ovg input{width:100%;text-align:right;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px}
 .doc.cp .rsec.k-sales .ovs{grid-column:1/-1;margin:2px 0 0;padding:4px 8px;display:grid;grid-template-columns:minmax(0,34fr) minmax(0,66fr);gap:2px 10px;align-items:center}.doc.cp .ovs .ovh{grid-column:1/-1;margin:0}.doc.cp .ovs .ovh b{font-size:11.5px}.doc.cp .ovs .ovh .sub{font-size:10px}.doc.cp .ovs .bars{height:auto;display:block}.doc.cp .ovs table.ovt{margin:0}
 .pc{display:inline-block;font-weight:700;font-size:.92em;padding:0 7px;border-radius:999px;line-height:1.6;margin-right:3px;white-space:nowrap}.pc0{background:#e3ebf7;color:#1f3b63}.pc1{background:#dff3ef;color:#0b6a5c}.pc2{background:#efe6fa;color:#5b2f99}.pc3{background:#fdeedd;color:#9a4d06}.pcx{background:#eef0f3;color:#555}.pcw{margin:0 2px 0 4px;font-size:.9em}.whoc{margin-right:4px}
+.savechip{position:fixed;left:12px;bottom:14px;z-index:90;background:rgba(15,23,42,.88);color:#fff;font-size:12px;border-radius:999px;padding:5px 12px;transition:opacity .3s}.savechip.hide{opacity:0;pointer-events:none}.savechip.ok{background:#1e7a4b}.savechip.bad{background:#b42318;cursor:pointer;font-weight:700}@media(max-width:640px){.savechip{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
 .syncchip{position:fixed;top:10px;right:12px;z-index:90;background:rgba(15,23,42,.85);color:#fff;font-size:11.5px;border-radius:999px;padding:4px 10px;pointer-events:none}@media(max-width:640px){.syncchip{top:auto;bottom:74px;right:50%;transform:translateX(50%)}}
 .sdbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;background:var(--navy);color:#fff;border-radius:999px;padding:8px 10px 8px 16px;display:flex;gap:10px;align-items:center;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.25)}.sdbar .btn{background:var(--gold);color:#111;border:none}tr.picked td{background:#f1f8f4}.pk2{display:block;font-size:11.5px;color:#1e7a4b;font-weight:700;margin-top:3px}
 .kpi{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:6px 0 14px;font-size:12px}.kpi .kl{color:#555;font-weight:700;margin-right:2px}.kpi .kc{border:1px solid #d7dde6;border-radius:999px;padding:2px 9px 2px 7px;background:#f6f8fb;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}.kpi .kc b{color:var(--navy);margin-right:4px;font-size:13px}.kpi .kc.warn{border-color:#f3c3b1;background:#fff4ef}.kpi .kc.warn b{color:#b42318}.kpi .kc.next{border-color:#cfe0d6;background:#f1f8f4}.kpi .kc.next b{color:#1e7a4b}
@@ -1832,6 +1833,26 @@ if (!window.google) {
      ok: true
     };
    },
+   wrPatchItem: function(id, p) {
+    var hit = db.items.filter(function(x) {
+     return x.id === id && !x.del;
+    })[0];
+    if (!hit) return {
+     ok: false,
+     gone: true,
+     msg: "이미 지워진 업무예요"
+    };
+    Object.keys(p || {}).forEach(function(k) {
+     hit[k] = p[k];
+    });
+    if (hit.status === "해결") hit.resolved = hit.resolved || now(); else hit.resolved = "";
+    hit.updated = now();
+    sv();
+    return {
+     ok: true,
+     item: JSON.parse(JSON.stringify(hit))
+    };
+   },
    wrMinutesGet: function(p) {
     return {
      ok: true,
@@ -2498,8 +2519,66 @@ function gs(fn) {
  var args = [].slice.call(arguments, 1);
  if (/^wr(SaveSales|SetSalesFix|SaveItemMap|SaveCustMap|SaveBrands)$/.test(fn) && window.S) S._seg = null;
  return new Promise(function(res, rej) {
-  google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn].apply(null, args);
+  google.script.run.withSuccessHandler(function(r) {
+   try {
+    snapWalk_(r, 0);
+   } catch (e) {}
+   res(r);
+  }).withFailureHandler(rej)[fn].apply(null, args);
  });
+}
+
+var PATCH_KEYS = [ "date", "person", "type", "cust", "end", "prod", "content", "status", "amount", "with", "note", "brand" ];
+
+function srvSet_(o, src) {
+ try {
+  var c = {};
+  Object.keys(src || o).forEach(function(k) {
+   if (k[0] !== "_") c[k] = (src || o)[k];
+  });
+  Object.defineProperty(o, "_srv", {
+   value: JSON.stringify(c),
+   writable: true,
+   enumerable: false,
+   configurable: true
+  });
+ } catch (e) {}
+}
+
+function snapWalk_(r, d) {
+ if (!r || typeof r !== "object" || d > 3) return;
+ if (Array.isArray(r)) {
+  r.forEach(function(x) {
+   snapWalk_(x, d + 1);
+  });
+  return;
+ }
+ if (r.id && r.date && r.person !== undefined && r.type !== undefined) {
+  srvSet_(r);
+  return;
+ }
+ Object.keys(r).forEach(function(k) {
+  snapWalk_(r[k], d + 1);
+ });
+}
+
+function pv_(k, v) {
+ return k === "amount" ? Number(v) || 0 : String(v == null ? "" : v);
+}
+
+function patchOf_(it) {
+ if (!it._srv) return null;
+ var b;
+ try {
+  b = JSON.parse(it._srv);
+ } catch (e) {
+  return null;
+ }
+ var p = {};
+ PATCH_KEYS.forEach(function(k) {
+  if (pv_(k, it[k]) !== pv_(k, b[k])) p[k] = pv_(k, it[k]);
+ });
+ return p;
 }
 
 function store(k, v) {
@@ -2605,7 +2684,7 @@ function mergeItems_(old, fresh) {
   by[i.id] = k;
  });
  old.forEach(function(o) {
-  if (!o.id || o._pending || o._saving) {
+  if (!o.id || o._pending || o._saving || o._failed) {
    if (o.id && by[o.id] !== undefined) out[by[o.id]] = o; else out.push(o);
    return;
   }
@@ -2626,6 +2705,9 @@ function boot() {
  if (c && c.ok && c.current === mondayOf(todayKst()) && c.people) {
   applyBoot(c, true);
   syncChip(true);
+ } else {
+  var ml = $("#myList");
+  if (ml) ml.innerHTML = '<div class="sub" style="padding:22px 16px"><span class="aispin"></span> 업무를 불러오는 중…</div>';
  }
  gs("wrBootstrap", null).then(function(b) {
   syncChip(false);
@@ -2645,6 +2727,7 @@ function applyBoot(b, cached) {
  var first = !S.boot, old = S.boot, keepPast = !first && old && S.period !== old.current;
  S.boot = b;
  S.boot.closedCur = !!b.closed;
+ if (b.brands) S._brands = b.brands;
  if (keepPast) S.boot.closed = old.closed;
  if (!keepPast) {
   S.period = b.period;
@@ -2726,7 +2809,26 @@ function renderHeader() {
  });
 }
 
+function bootCacheSoon_() {
+ clearTimeout(S._bcT);
+ S._bcT = setTimeout(function() {
+  if (!S.boot || !S.boot.ok || S.period !== S.boot.current) return;
+  var c = Object.assign({}, S.boot);
+  c.items = S.items.filter(function(i) {
+   return i.id && !i._pending;
+  }).map(function(i) {
+   var o = {};
+   Object.keys(i).forEach(function(k) {
+    if (k[0] !== "_") o[k] = i[k];
+   });
+   return o;
+  });
+  cachePut(bootKey(), c);
+ }, 1500);
+}
+
 function renderAll() {
+ bootCacheSoon_();
  loadBrands_();
  renderMy();
  renderBoard();
@@ -4179,14 +4281,81 @@ function flushPend() {
 
 window.addEventListener("online", flushPend);
 
+function saveStat_(ok) {
+ var c = $("#saveChip"), sv = S.items.filter(function(i) {
+  return i._saving;
+ }).length, fl = S.items.filter(function(i) {
+  return i._failed;
+ });
+ clearTimeout(S._ssT);
+ if (!c) {
+  c = el("div", "savechip noprint");
+  c.id = "saveChip";
+  document.body.appendChild(c);
+ }
+ if (fl.length) {
+  c.className = "savechip noprint bad";
+  c.innerHTML = "⚠ 저장 안 된 업무 " + fl.length + "건 — 눌러서 다시 보내기";
+  c.onclick = function() {
+   fl.forEach(function(i) {
+    delete i._failed;
+    save(i);
+   });
+  };
+  return;
+ }
+ c.onclick = null;
+ if (sv) {
+  c.className = "savechip noprint";
+  c.innerHTML = '<span class="aispin"></span>저장 중' + (sv > 1 ? " " + sv + "건" : "") + "…";
+  return;
+ }
+ if (ok) {
+  c.className = "savechip noprint ok";
+  c.innerHTML = "✓ 저장됨";
+  S._ssT = setTimeout(function() {
+   c.className = "savechip noprint hide";
+  }, 1600);
+ } else c.className = "savechip noprint hide";
+}
+
+function calSoon_() {
+ if (WR_MODE === "demo") return;
+ clearTimeout(S._calT);
+ S._calT = setTimeout(function() {
+  gs("wrCalSync").catch(function() {});
+ }, 4e3);
+}
+
+window.addEventListener("beforeunload", function(e) {
+ if (S.items && S.items.some(function(i) {
+  return i._saving || i._failed;
+ })) {
+  e.preventDefault();
+  e.returnValue = "";
+ }
+});
+
 function save(it) {
+ if (it._saving) {
+  it._again = 1;
+  return Promise.resolve();
+ }
  var copy = {};
  Object.keys(it).forEach(function(k) {
   if (k[0] !== "_") copy[k] = it[k];
  });
+ var patch = it.id ? patchOf_(it) : null;
+ if (patch && !Object.keys(patch).length) {
+  delete it._failed;
+  saveStat_();
+  return Promise.resolve();
+ }
  var fail = function(msg) {
   if (it.id) {
-   toast("저장 실패: " + msg);
+   it._failed = 1;
+   saveStat_();
+   toast("저장 안 됨: " + msg);
    return;
   }
   it._pk = it._pk || "p" + Date.now() + Math.random().toString(36).slice(2, 6);
@@ -4198,54 +4367,90 @@ function save(it) {
   c2._pk = it._pk;
   q.push(c2);
   pendSet(q);
+  saveStat_();
   toast("전파가 안 돼서 이 기기에 보관했어요 — 나중에 자동 전송");
  };
  var waits = [ 2e3, 5e3, 1e4 ], n = 0, soft = function(m) {
   return /잠금|Lock|시간\s*초과|timed? ?out|Service|서비스|일시|Failed to fetch|NetworkError|network|연결/i.test(String(m || ""));
  };
  var again = function(msg) {
+  if (/허용되지 않은/.test(String(msg || "")) && patch) {
+   patch = null;
+   setTimeout(send, 0);
+   return true;
+  }
   if (it.id && n < waits.length && soft(msg)) {
    setTimeout(send, waits[n++]);
    return true;
   }
   return false;
  };
+ var done = function() {
+  delete it._saving;
+  if (it._again) {
+   delete it._again;
+   save(it);
+  }
+  saveStat_(true);
+ };
  var send = function() {
-  return gs("wrSaveItem", copy).then(function(r) {
+  return (patch ? gs("wrPatchItem", it.id, patch) : gs("wrSaveItem", copy)).then(function(r) {
    if (!r.ok) {
+    if (r.gone) {
+     delete it._saving;
+     delete it._again;
+     S.items = S.items.filter(function(x) {
+      return x !== it;
+     });
+     renderAll();
+     saveStat_();
+     toast("다른 사람이 지운 업무예요 — 화면에서 뺐어요");
+     return;
+    }
     if (r.conflict && r.item) {
      delete it._saving;
+     delete it._again;
      Object.keys(r.item).forEach(function(k) {
       it[k] = r.item[k];
      });
+     srvSet_(it, r.item);
      renderAll();
+     saveStat_();
      toast(r.msg);
      return;
     }
     if (again(r.msg)) return;
     delete it._saving;
-    fail(it.id ? r.msg + " — 이 업무는 서버에 저장되지 않았어요. 다시 고쳐 주세요" : r.msg);
+    delete it._again;
+    fail(r.msg);
     return;
    }
-   delete it._saving;
    if (!it.id) {
     it.id = r.item.id;
     it.created = r.item.created;
    }
    (S._savedIds = S._savedIds || {})[it.id] = 1;
-   it.updated = r.item.updated || it.updated;
-   copy.updated = it.updated;
+   Object.keys(r.item).forEach(function(k) {
+    if (k[0] !== "_" && (it[k] === undefined || pv_(k, it[k]) === pv_(k, copy[k]))) it[k] = r.item[k];
+   });
+   srvSet_(it, r.item);
    delete it._pending;
+   delete it._failed;
+   done();
+   calSoon_();
    renderAll();
    if (S.view === "cal") loadCal();
    if (S.view === "report") loadReport();
   }).catch(function(e) {
    if (again(e && e.message)) return;
    delete it._saving;
+   delete it._again;
    fail(e.message);
   });
  };
  it._saving = 1;
+ delete it._failed;
+ saveStat_();
  return send();
 }
 
@@ -4269,6 +4474,7 @@ function remove(it) {
   var del = function() {
    gs("wrDeleteItem", it.id).then(function(r) {
     if (r.ok || r.msg === "없음") {
+     calSoon_();
      if (S.view === "cal") loadCal();
      return;
     }
