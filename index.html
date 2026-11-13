@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.44 -->
+<!-- 주간보고 화면 v1.45 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.44</title>
+<title>HS TECH 주간보고 v1.45</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -2528,6 +2528,198 @@ function gs(fn) {
  });
 }
 
+function nmJ_(v) {
+ return JSON.stringify(v === undefined ? null : v);
+}
+
+function nmText_(b, m, t) {
+ b = String(b || "");
+ m = String(m || "");
+ t = String(t || "");
+ if (m === b) return t;
+ if (t === b || m === t) return m;
+ var B = b.split("\n"), M = m.split("\n"), T = t.split("\n"), cnt = function(A) {
+  var c = {};
+  A.forEach(function(x) {
+   c["$" + x] = (c["$" + x] || 0) + 1;
+  });
+  return c;
+ };
+ var cb = cnt(B), cm = cnt(M), rm = {}, add = {};
+ Object.keys(cb).forEach(function(x) {
+  var d = cb[x] - (cm[x] || 0);
+  if (d > 0) rm[x] = d;
+ });
+ Object.keys(cm).forEach(function(x) {
+  var d = cm[x] - (cb[x] || 0);
+  if (d > 0) add[x] = d;
+ });
+ var out = T.filter(function(x) {
+  if (rm["$" + x] > 0) {
+   rm["$" + x]--;
+   return false;
+  }
+  return true;
+ }), pos = -1;
+ M.forEach(function(x) {
+  var k;
+  if (add["$" + x] > 0) {
+   add["$" + x]--;
+   if (x.trim() && !cb["$" + x] && (k = out.indexOf(x)) >= 0) {
+    pos = k;
+    return;
+   }
+   out.splice(pos + 1, 0, x);
+   pos++;
+   return;
+  }
+  k = out.indexOf(x, Math.max(pos, 0));
+  if (k < 0) k = out.indexOf(x);
+  if (k >= 0) pos = k;
+ });
+ return out.join("\n");
+}
+
+function nmArr_(b, m, t) {
+ b = b || [];
+ m = m || [];
+ t = t || [];
+ if (nmJ_(m) === nmJ_(b)) return t;
+ if (nmJ_(t) === nmJ_(b)) return m;
+ var id = function(x) {
+  return x && typeof x === "object" && (x.sid || x.id) || nmJ_(x);
+ }, ix = function(A) {
+  var o = {};
+  A.forEach(function(x) {
+   o["$" + id(x)] = x;
+  });
+  return o;
+ };
+ var Bi = ix(b), Ti = ix(t), Mi = ix(m), out = [];
+ m.forEach(function(x) {
+  var k = "$" + id(x);
+  if (Ti.hasOwnProperty(k)) out.push(nmVal_(Bi[k], x, Ti[k])); else if (!Bi.hasOwnProperty(k) || nmJ_(x) !== nmJ_(Bi[k])) out.push(x);
+ });
+ t.forEach(function(x) {
+  var k = "$" + id(x);
+  if (!Mi.hasOwnProperty(k) && !Bi.hasOwnProperty(k)) out.push(x);
+ });
+ return out;
+}
+
+function nmObj_(b, m, t) {
+ b = b || {};
+ m = m || {};
+ t = t || {};
+ var out = {}, seen = {};
+ Object.keys(m).concat(Object.keys(t)).forEach(function(k) {
+  if (seen[k]) return;
+  seen[k] = 1;
+  var v = nmVal_(b[k], m[k], t[k]);
+  if (v !== undefined && v !== null) out[k] = v; else if (v === null && (m[k] === null || t[k] === null)) out[k] = null;
+ });
+ return out;
+}
+
+function nmVal_(b, m, t) {
+ if (nmJ_(m) === nmJ_(b)) return t;
+ if (nmJ_(t) === nmJ_(b) || nmJ_(m) === nmJ_(t)) return m;
+ if (typeof m === "string" && typeof t === "string") return nmText_(typeof b === "string" ? b : "", m, t);
+ if (Array.isArray(m) && Array.isArray(t)) return nmArr_(Array.isArray(b) ? b : [], m, t);
+ if (m && t && typeof m === "object" && typeof t === "object" && !Array.isArray(m) && !Array.isArray(t)) return nmObj_(b && typeof b === "object" ? b : {}, m, t);
+ return m;
+}
+
+function delSrv_(id, undo) {
+ var dn = 0, dw = [ 2e3, 5e3, 1e4 ], bad = function(m) {
+  if (dn < dw.length) {
+   setTimeout(go, dw[dn++]);
+   return;
+  }
+  if (undo) undo(m); else {
+   if (S._delIds) delete S._delIds[id];
+   toast("삭제 안 됨" + (m ? ": " + m : "") + " — 잠시 뒤 다시 보여요");
+   syncItems_(true);
+  }
+ }, go = function() {
+  gs("wrDeleteItem", id).then(function(r) {
+   if (r && (r.ok || r.msg === "없음")) {
+    calSoon_();
+    return;
+   }
+   bad(r && r.msg);
+  }).catch(function(e) {
+   bad(e && e.message);
+  });
+ };
+ go();
+}
+
+function verNewer_(a, b) {
+ var f = function(v) {
+  return String(v || "").replace(/^v/i, "").split(".").map(Number);
+ };
+ a = f(a);
+ b = f(b);
+ for (var i = 0; i < 3; i++) {
+  if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) > (b[i] || 0);
+ }
+ return false;
+}
+
+function verIdle_() {
+ return !S.dirty && !S.saving && !(S.items || []).some(function(i) {
+  return i._saving || i._failed || i._pending;
+ }) && !document.querySelector(".modal.show") && !String(($("#quick") || {}).value || "").trim() && !(S.minutes && S.minutes._dirty);
+}
+
+function verChip_() {
+ var c = $("#verChip");
+ if (!c) {
+  c = el("div", "savechip noprint");
+  c.id = "verChip";
+  c.style.cssText = "left:auto;right:12px;background:#1d4ed8;cursor:pointer";
+  document.body.appendChild(c);
+ }
+ c.textContent = "새 버전 " + S._verNew + " — 눌러서 새로고침";
+ c.onclick = function() {
+  location.reload();
+ };
+}
+
+function verCheck_() {
+ if (WR_MODE !== "live" || location.protocol !== "https:" || S._verNew || Date.now() - (S._verT || 0) < 3e5) return;
+ S._verT = Date.now();
+ fetch(location.pathname + "?vc=" + Date.now(), {
+  cache: "no-store",
+  headers: {
+   Range: "bytes=0-999"
+  }
+ }).then(function(r) {
+  return r.ok ? r.text() : "";
+ }).then(function(t) {
+  var m = t.match(/주간보고 화면 (v\d+(?:\.\d+)+)/) || t.match(/<title>[^<]*?(v\d+(?:\.\d+)+)/);
+  if (!m || !verNewer_(m[1], HTML_VER)) return;
+  S._verNew = m[1];
+  verChip_();
+ }).catch(function() {});
+}
+
+setInterval(function() {
+ if (!document.hidden) verCheck_();
+}, 9e5);
+
+document.addEventListener("visibilitychange", function() {
+ if (document.hidden || !S.boot) return;
+ if (S._verNew && verIdle_()) {
+  location.reload();
+  return;
+ }
+ verCheck_();
+ if (S.view === "report") notesPull_();
+ if (S.view === "board") minPull_();
+});
+
 var PATCH_KEYS = [ "date", "person", "type", "cust", "end", "prod", "content", "status", "amount", "with", "note", "brand" ];
 
 function srvSet_(o, src) {
@@ -2915,8 +3107,10 @@ document.addEventListener("visibilitychange", function() {
 
 function itemsSig_(a) {
  return a.map(function(i) {
-  return (i.id || i._pk || "") + "|" + (i.updated || "") + "|" + (i._pending ? 1 : 0);
- }).sort().join(",");
+  return (i.id || i._pk || "") + "|" + (i.updated || "") + "|" + (i._pending ? 1 : 0) + "|" + PATCH_KEYS.map(function(k) {
+   return pv_(k, i[k]);
+  }).join("");
+ }).sort().join("");
 }
 
 function syncBusy_() {
@@ -2949,6 +3143,8 @@ function syncItems_(force) {
 
 setInterval(function() {
  if (document.hidden) return;
+ if (S.view === "report") notesPull_();
+ if (S.view === "board") minPull_();
  if (S._syncHold && !syncBusy_()) {
   S.items = mergeItems_(S.items, S._syncHold);
   S._syncHold = null;
@@ -4275,6 +4471,7 @@ function flushPend() {
    return x._pk === copy._pk;
   })[0] || copy;
   delete it._pending;
+  it._re = 1;
   save(it);
  });
 }
@@ -4345,6 +4542,11 @@ function save(it) {
  Object.keys(it).forEach(function(k) {
   if (k[0] !== "_") copy[k] = it[k];
  });
+ if (!it.id) {
+  it._pk = it._pk || "p" + Date.now() + Math.random().toString(36).slice(2, 6);
+  copy.rk = it._pk;
+  if (it._re) copy.rs = 1;
+ }
  var patch = it.id ? patchOf_(it) : null;
  if (patch && !Object.keys(patch).length) {
   delete it._failed;
@@ -4379,7 +4581,8 @@ function save(it) {
    setTimeout(send, 0);
    return true;
   }
-  if (it.id && n < waits.length && soft(msg)) {
+  if (n < waits.length && soft(msg) && (it.id || navigator.onLine !== false)) {
+   if (!it.id) copy.rs = 1;
    setTimeout(send, waits[n++]);
    return true;
   }
@@ -4436,6 +4639,9 @@ function save(it) {
    srvSet_(it, r.item);
    delete it._pending;
    delete it._failed;
+   delete it._re;
+   delete it.rk;
+   delete it.rs;
    done();
    calSoon_();
    renderAll();
@@ -4861,9 +5067,7 @@ function delQuiet_(x) {
  });
  if (x.id) {
   (S._delIds = S._delIds || {})[x.id] = 1;
-  gs("wrDeleteItem", x.id).then(function(r) {
-   if (!r.ok) toast("삭제 실패");
-  });
+  delSrv_(x.id);
  }
 }
 
@@ -5879,9 +6083,7 @@ function openMergePick_(r) {
    });
    Object.keys(ids).forEach(function(id) {
     (S._delIds = S._delIds || {})[id] = 1;
-    gs("wrDeleteItem", id).then(function(res) {
-     if (!res.ok) toast("삭제 실패");
-    });
+    delSrv_(id);
    });
    close();
    renderAll();
@@ -6189,11 +6391,32 @@ function loadMinutes_() {
  };
  gs("wrMinutesGet", p).then(function(r) {
   if (meetP_() !== p) return;
+  var old = S.minutes, mb = function(v) {
+   return {
+    attendees: (v && v.attendees || meetBase_()).slice(),
+    decisions: v && v.decisions || ""
+   };
+  };
   if (r && r.ok && r.minutes) {
    var sn = r.minutes.snap;
    delete r.minutes.snap;
-   S.minutes = r.minutes;
+   var v = r.minutes;
+   if (!sn && old && old.period === p && old._dirty) {
+    old.attendees = nmArr_(meetBase_(), old.attendees || [], v.attendees || []);
+    old.decisions = nmText_("", old.decisions || "", v.decisions || "");
+    old._base = mb(v);
+    old.savedAt = v.savedAt;
+    old.savedBy = v.savedBy;
+    delete old._loading;
+    var t = $("#minDec");
+    if (t && t.value !== old.decisions) t.value = old.decisions;
+    drawWho_();
+    minDirty_();
+    return;
+   }
+   S.minutes = v;
    S.minutes.period = p;
+   S.minutes._base = mb(v);
    if (sn) {
     S.minutes._ro = 1;
     S.snapB = sn;
@@ -6202,13 +6425,49 @@ function loadMinutes_() {
      return;
     }
    }
-  } else {
+  } else if (S.minutes) {
    delete S.minutes._loading;
+   S.minutes._base = mb(null);
   }
   renderMinutes_();
  }).catch(function() {
-  delete S.minutes._loading;
+  if (S.minutes) {
+   delete S.minutes._loading;
+   S.minutes._base = {
+    attendees: meetBase_(),
+    decisions: ""
+   };
+  }
   renderMinutes_();
+ });
+}
+
+function minPull_() {
+ var m = S.minutes;
+ if (!m || m._ro || m._loading || m._dirty || WR_MODE === "demo" || S._mpQ || m.period !== meetP_()) return;
+ var a = document.activeElement;
+ if (a && a.closest && a.closest("#minutes,#minDecBox")) return;
+ var p = m.period;
+ S._mpQ = 1;
+ gs("wrMinutesGet", p).then(function(r) {
+  S._mpQ = 0;
+  if (S.minutes !== m || m._dirty || !r || !r.ok || !r.minutes || r.minutes.snap) return;
+  var v = r.minutes;
+  if (v.savedAt === m.savedAt && (v.decisions || "") === (m.decisions || "") && JSON.stringify(v.attendees || []) === JSON.stringify(m.attendees || [])) return;
+  m.attendees = v.attendees || [];
+  m.decisions = v.decisions || "";
+  m.savedAt = v.savedAt;
+  m.savedBy = v.savedBy;
+  m._base = {
+   attendees: m.attendees.slice(),
+   decisions: m.decisions
+  };
+  var t = $("#minDec");
+  if (t && document.activeElement === t) t.value = m.decisions;
+  drawWho_();
+  drawDec_();
+ }).catch(function() {
+  S._mpQ = 0;
  });
 }
 
@@ -6325,34 +6584,62 @@ function minSaveNow_(manual) {
  clearTimeout(S._minT);
  var o = {
   period: m.period || meetP_(),
-  attendees: m.attendees || [],
+  attendees: (m.attendees || []).slice(),
   decisions: m.decisions || "",
   savedBy: S.person || ""
  };
+ if (m._base) o.base = m._base;
  var b = $("#minSave") || {};
  b.disabled = true;
  var st0 = $("#minState");
  if (st0) st0.textContent = "저장 중…";
+ var bad = function(msg) {
+  b.disabled = false;
+  var s1 = $("#minState");
+  if (s1) s1.textContent = "저장 실패 — 곧 다시 시도";
+  toast("회의록 저장 실패: " + (msg || ""));
+  clearTimeout(S._minT);
+  S._minT = setTimeout(function() {
+   if (S.minutes === m && m._dirty) minSaveNow_(false);
+  }, 8e3);
+ };
  gs("wrMinutesSave", o).then(function(r) {
   b.disabled = false;
   if (!r || !r.ok) {
-   var s1 = $("#minState");
-   if (s1) s1.textContent = "저장 실패";
-   toast("회의록 저장 실패: " + (r && r.msg || ""));
+   bad(r && r.msg);
    return;
   }
+  var same = (m.decisions || "") === o.decisions && JSON.stringify(m.attendees || []) === JSON.stringify(o.attendees), mix = r.mixed && same;
+  if (mix) {
+   m.attendees = r.attendees || [];
+   m.decisions = r.decisions || "";
+   if (S.minutes === m) {
+    var t = $("#minDec");
+    if (t && t.value !== m.decisions) t.value = m.decisions;
+    drawWho_();
+   }
+   toast("다른 분이 적은 내용과 합쳤어요");
+  }
+  m._base = mix ? {
+   attendees: m.attendees.slice(),
+   decisions: m.decisions
+  } : {
+   attendees: o.attendees,
+   decisions: o.decisions
+  };
   m.savedAt = r.savedAt || nowKstStr();
   m.savedBy = r.savedBy || S.person || "";
-  m._dirty = false;
   S._minList = null;
+  if (!same) {
+   minDirty_();
+   return;
+  }
+  m._dirty = false;
   var st = $("#minState");
   if (st) st.textContent = "저장됨 " + m.savedAt.slice(11) + (m.savedBy ? " · " + m.savedBy : "");
   if (manual) toast("회의록을 저장했습니다");
  }).catch(function(e) {
-  b.disabled = false;
-  var s1 = $("#minState");
-  if (s1) s1.textContent = "저장 실패";
-  toast("회의록 저장 실패: " + e.message);
+  bad(e && e.message);
  });
 }
 
@@ -6655,6 +6942,7 @@ function loadReport() {
   var c = cacheGet(repKey(p));
   if (c && c.period === p) {
    S.report = c;
+   if (!c.frozen) nbSet_(p, c.notes);
    renderReport();
   } else {
    S.report = null;
@@ -6696,9 +6984,34 @@ function fetchReport_(p) {
  return o.q;
 }
 
+function nbSet_(per, n) {
+ S._nb = {
+  per: per,
+  j: JSON.stringify(n || {})
+ };
+}
+
+function nbGet_(per) {
+ return S._nb && S._nb.per === per ? S._nb.j : null;
+}
+
 function applyReport_(rep) {
- if (S.dirty && S.report && S.report.period === rep.period && !rep.frozen) rep.notes = S.report.notes;
+ var same = S.report && S.report.period === rep.period;
+ if (!rep.frozen) {
+  if (same && (S.dirty || S.saving)) {
+   var bj = nbGet_(rep.period);
+   if (S.saving || !bj) rep.notes = S.report.notes; else {
+    var srvN = rep.notes || {};
+    rep.notes = nmObj_(JSON.parse(bj), S.report.notes || {}, srvN);
+    nbSet_(rep.period, srvN);
+   }
+  } else nbSet_(rep.period, rep.notes);
+ }
  S.report = rep;
+ repRedraw_();
+}
+
+function repRedraw_() {
  var root = $("#reportRoot"), isEd = function(a) {
   return a && root.contains(a) && (a.isContentEditable || /TEXTAREA|INPUT|SELECT/.test(a.tagName));
  };
@@ -6723,6 +7036,32 @@ function applyReport_(rep) {
   }, 0);
  };
  root.addEventListener("focusout", h);
+}
+
+function notesPull_() {
+ var r = S.report;
+ if (!r || r.frozen || WR_MODE === "demo" || S.saving || S._npQ || r.period !== S.period || !nbGet_(r.period)) return;
+ var per = r.period;
+ S._npQ = 1;
+ gs("wrNotesLive", per).then(function(x) {
+  S._npQ = 0;
+  if (!x || !x.ok || S.report !== r) return;
+  if (x.frozen) {
+   if (S.view === "report" && !S.dirty) loadReport();
+   return;
+  }
+  if (!x.saved || S.saving) return;
+  var b0 = nbGet_(per), sj = JSON.stringify(x.notes || {});
+  if (!b0 || sj === b0) return;
+  var before = JSON.stringify(r.notes || {}), mg = nmObj_(JSON.parse(b0), r.notes || {}, x.notes || {});
+  nbSet_(per, x.notes);
+  if (JSON.stringify(mg) === before) return;
+  r.notes = mg;
+  if (!S.dirty) cachePut(repKey(per), r);
+  repRedraw_();
+ }).catch(function() {
+  S._npQ = 0;
+ });
 }
 
 function k(n) {
@@ -6857,10 +7196,10 @@ function saveNotes() {
 function flushNotes() {
  if (!S.dirty || !S.report || S.saving) return;
  S.saving = true;
- var per = S.report.period, notes = JSON.parse(JSON.stringify(S.report.notes));
+ var per = S.report.period, sentJ = JSON.stringify(S.report.notes || {}), notes = JSON.parse(sentJ), bj = nbGet_(per);
  S.dirty = false;
  setSaveState("저장 중…");
- gs("wrSaveNotes", per, notes).then(function(x) {
+ gs("wrSaveNotes", per, notes, bj ? JSON.parse(bj) : null).then(function(x) {
   S.saving = false;
   if (!x.ok) {
    S.dirty = true;
@@ -6868,7 +7207,16 @@ function flushNotes() {
    return;
   }
   setSaveState("저장됨 " + (new Date).toTimeString().slice(0, 8));
-  if (S.report && S.report.period === per) cachePut(repKey(per), S.report);
+  if (S.report && S.report.period === per) {
+   var mix = x.mixed && x.notes;
+   nbSet_(per, mix ? x.notes : notes);
+   if (mix) {
+    S.report.notes = JSON.stringify(S.report.notes || {}) === sentJ ? x.notes : nmObj_(notes, S.report.notes || {}, x.notes);
+    repRedraw_();
+    toast("다른 분이 고친 내용과 합쳤어요");
+   }
+   cachePut(repKey(per), S.report);
+  }
   if (S.dirty) flushNotes();
  }).catch(function() {
   S.saving = false;
@@ -7022,6 +7370,7 @@ function renderReport() {
    gs("wrFinalize", r.period, frozen).then(function(x) {
     if (x.ok) {
      S.report = x.report;
+     if (!x.report.frozen) nbSet_(x.report.period, x.report.notes);
      if (r.period === S.boot.current) {
       S.boot.finalized = !frozen;
       S.boot.closed = !frozen;
