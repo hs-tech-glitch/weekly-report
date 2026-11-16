@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.45 -->
+<!-- 주간보고 화면 v1.46 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,10 +6,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f1b2d"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주간보고">
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.45</title>
+<title>HS TECH 주간보고 v1.46</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -626,6 +686,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
   <div class="row" id="peopleChips"></div>
 </header>
 
+
 <nav class="tabs" id="tabs">
   <button data-v="my" class="on">내 업무</button>
   <button data-v="cal">일정</button>
@@ -633,6 +694,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
   <button data-v="report">보고서</button>
   <button data-v="history">지난 기록</button>
 </nav>
+
 
 <section id="v-my">
   <div id="deadlineBanner" class="hide"></div>
@@ -650,7 +712,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
 
   <div class="card" id="candBox" style="margin-top:14px;display:none">
     <div class="sec row" style="padding-bottom:8px">
-      <h2 style="margin:0">가져올 수 있는 견적·수주</h2>
+      <h2 style="margin:0">가져올 수 있는 견적</h2>
       <div class="ctabs" id="candTabs"></div>
       <div class="spacer"></div>
       <button class="btn sm" id="candAll">모두 추가</button>
@@ -663,6 +725,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
     <div id="nextList"></div>
   </div>
 </section>
+
 
 <section id="v-cal" style="display:none">
   <div class="row" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
@@ -680,6 +743,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
   </div>
 </section>
 
+
 <section id="v-board" style="display:none">
   <div class="row noprint" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
     <span class="sub" id="boardCount"></span><div class="spacer"></div>
@@ -690,15 +754,18 @@ header{padding-top:calc(10px + env(safe-area-inset-top,0px) * 1.3)}
   <div class="kanban" id="kanban"></div>
 </section>
 
+
 <section id="v-report" style="display:none">
   <div id="reportRoot"></div>
 </section>
+
 
 <section id="v-history" style="display:none">
   <div class="chips" id="histKind" style="margin-bottom:10px"><span class="tag s-진행중 on" data-k="report">보고서</span><span class="tag s-진행중" data-k="minutes">회의록</span></div>
   <div class="card" id="histList"><div class="empty">불러오는 중…</div></div>
 </section>
 </div>
+
 
 <div class="modal" id="modal">
   <div class="sheet ed">
@@ -4718,34 +4785,16 @@ function candKind_(c) {
 }
 
 function drawCands_() {
- var box = $("#candBox"), l = $("#candList"), tb = $("#candTabs"), all = S._cands || [];
+ var box = $("#candBox"), l = $("#candList"), tb = $("#candTabs"), all = (S._cands || []).filter(function(c) {
+  return candKind_(c) === "견적";
+ });
  if (!all.length) {
   box.style.display = "none";
   return;
  }
  box.style.display = "";
- var kinds = [ "견적", "수주" ].filter(function(k) {
-  return all.some(function(c) {
-   return candKind_(c) === k;
-  });
- });
- if (kinds.indexOf(S._candTab) < 0) S._candTab = kinds[0];
- tb.innerHTML = "";
- kinds.forEach(function(k) {
-  var n = all.filter(function(c) {
-   return candKind_(c) === k;
-  }).length;
-  var b = el("button", k === S._candTab ? "on" : "", k + " " + n);
-  b.onclick = function() {
-   S._candTab = k;
-   drawCands_();
-   l.scrollTop = 0;
-  };
-  tb.appendChild(b);
- });
- var list = all.filter(function(c) {
-  return candKind_(c) === S._candTab;
- }).sort(function(a, b) {
+ tb.innerHTML = '<span class="sub">' + all.length + "건</span>";
+ var list = all.slice().sort(function(a, b) {
   return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
  });
  l.innerHTML = "";
@@ -4774,15 +4823,15 @@ function addCand(c) {
 }
 
 $("#candAll").onclick = function() {
- var k = S._candTab, L = (S._cands || []).filter(function(c) {
-  return candKind_(c) === k;
+ var L = (S._cands || []).filter(function(c) {
+  return candKind_(c) === "견적";
  });
  L.forEach(addCand);
  S._cands = (S._cands || []).filter(function(c) {
   return L.indexOf(c) < 0;
  });
  drawCands_();
- toast(k + " 모두 추가했습니다");
+ toast("견적 모두 추가했습니다");
 };
 
 function chips(box, list, cur, cls, onpick) {
