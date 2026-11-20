@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.46 -->
+<!-- 주간보고 화면 v1.47 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -66,10 +66,11 @@
 
 
 
+
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.46</title>
+<title>HS TECH 주간보고 v1.47</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -338,7 +339,7 @@ details.oth table{margin-top:8px}
 .bi.ck{cursor:pointer}.bi.ck:hover{background:#fdf6e3}
 .two textarea.note{min-height:70px;background:#fffdf5}
 @media(max-width:640px){.two{grid-template-columns:1fr}.two>div+div{border-left:none;border-top:1px solid #bbb}}
-@media print{.brsel{display:none}.pbr{display:inline}.doc h3.pb{break-before:page}table.rep.sales{font-size:9px}table.rep.sales th{font-size:9.5px}}
+@media print{.rsec.k-sales .bars{border:none}.brsel{display:none}.pbr{display:inline}.doc h3.pb{break-before:page}table.rep.sales{font-size:9px}table.rep.sales th{font-size:9.5px}}
 
 .rsec h3 .hx{margin-left:auto}
 .rsec h3>span{display:flex;align-items:center;gap:8px}
@@ -428,7 +429,7 @@ details.ins{margin-top:4px}details.ins summary{font-size:12px;color:var(--navy);
 .doc.cp h3{font-size:11.5px;margin:0 0 4px;gap:6px;break-after:avoid}.doc.cp h3:before{height:11px;width:3px}.doc.cp h3 small{font-size:10px}
 .doc.cp .rsec{margin:0 0 6px;break-inside:avoid;page-break-inside:avoid}
 .doc.cp .rsec.k-sales{display:grid;grid-template-columns:minmax(0,34fr) minmax(0,66fr);gap:4px 10px;align-items:stretch;margin-bottom:8px}
-.doc.cp .rsec.k-sales h3{grid-column:1/-1}.doc.cp .rsec.k-sales .bars{margin:0;padding:0 8px;box-sizing:border-box;height:100%;display:flex;flex-direction:column;justify-content:flex-start}.doc.cp .rsec.k-sales .bars .br{align-items:center;box-sizing:border-box}.doc.cp .rsec.k-sales table.rep{margin:0}
+.doc.cp .rsec.k-sales h3{grid-column:1/-1}.doc.cp .rsec.k-sales .bars{border:none;border-radius:0;margin:0;padding:0 8px;box-sizing:border-box;height:100%;display:flex;flex-direction:column;justify-content:flex-start}.doc.cp .rsec.k-sales .bars .br{align-items:center;box-sizing:border-box}.doc.cp .rsec.k-sales table.rep{margin:0}
 .doc.cp .bars .br{grid-template-columns:72px 1fr 112px;gap:7px;margin:2px 0;font-size:12px}.doc.cp .bars .br .bv small{font-size:10px}.doc.cp .bars .br.buyr{display:none}.doc.cp .bars .tot .yr{display:none}.doc.cp .bars .br.tot{border-top:1px solid #bbb;padding-top:4px;margin-top:4px}.doc.cp .bars .br .bt{height:13px}.doc.cp .bars .br .bv{grid-column:auto}
 .doc.cp table.rep{font-size:10.5px;min-width:0;table-layout:fixed}.doc.cp table.rep th{padding:3px 5px;font-size:10px}.doc.cp table.rep td{padding:3px 5px;line-height:1.3}
 .doc.cp table.rep.sales br.hb{display:none}.doc.cp table.rep.sales th{white-space:nowrap;letter-spacing:-.3px}.doc.cp .kpi{display:none!important}.doc.cp table.rep.sales{font-size:10px}.doc.cp table.rep.sales th{font-size:9.5px;padding:2px 3px}.doc.cp table.rep.sales td{padding:2px 3px}
