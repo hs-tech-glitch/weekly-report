@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.48 -->
+<!-- 주간보고 화면 v1.49 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -68,10 +68,11 @@
 
 
 
+
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.48</title>
+<title>HS TECH 주간보고 v1.49</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -320,7 +321,7 @@ table.rep.sales th{padding:6px 4px;font-size:11px;line-height:1.25}
 table.rep.sales td{padding:6px 5px}
 table.rep td.nm{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 table.rep td.bh{font-weight:800;color:#222;background:#f6f8fb;white-space:nowrap}
-table.rep.orders td{padding:5px 8px}table.rep.orders tfoot td{border-top:2px solid #334}
+table.rep.orders td{padding:5px 8px}table.rep.orders td.od,table.rep.orders th.od{padding:5px 4px;white-space:nowrap;text-align:center}table.rep.orders td.bsel{white-space:nowrap}table.rep.orders tfoot td{border-top:2px solid #334}
 table.rep td.cm{background:transparent}
 .tw{overflow-x:auto}
 .subt{font-size:12.5px;font-weight:700;color:var(--navy);margin:12px 0 5px}
@@ -2798,7 +2799,7 @@ document.addEventListener("visibilitychange", function() {
  if (S.view === "board") minPull_();
 });
 
-var PATCH_KEYS = [ "date", "person", "type", "cust", "end", "prod", "content", "status", "amount", "with", "note", "brand" ];
+var PATCH_KEYS = [ "date", "person", "type", "cust", "end", "prod", "content", "status", "amount", "with", "note", "brand", "proj" ];
 
 function srvSet_(o, src) {
  try {
@@ -8307,10 +8308,15 @@ function renderReport() {
     d.appendChild(freeText("orders_note", "수주 관련 메모 (팀장)"));
     return;
    }
+   var endOf = function(i) {
+    return i.end || i.endQ || "";
+   }, projOf = function(i) {
+    return i.proj || i.projQ || "";
+   };
    var t = el("table", "rep orders");
-   t.innerHTML = '<colgroup><col style="width:70px"><col><col style="width:110px"><col style="width:140px"></colgroup><thead><tr><th>날짜</th><th>고객사</th><th>브랜드</th><th>금액 (공급가)</th></tr></thead><tbody>' + rows.map(function(i) {
-    return '<tr><td class="sub">' + md(i.date) + "</td><td><b>" + esc(i.cust || titleOf(i)) + "</b>" + (i.end ? ' <span class="sub">→ ' + esc(i.end) + "</span>" : "") + '</td><td class="bsel" data-id="' + esc(i.id) + '" title="눌러서 브랜드 고르기">' + (esc(brandOf(i)) || '<span class="sub">브랜드 고르기</span>') + '</td><td class="nm asel" data-id="' + esc(i.id) + '" title="눌러서 금액 넣기·고치기">' + (i.amount ? won(i.amount) : /⚠/.test(i.content || "") ? '<span class="sub">금액 넣기</span>' : "-") + (/⚠/.test(i.content || "") ? ' <span class="wf warn" title="금액 확인 필요">⚠</span>' : "") + (isDup(i) ? ' <span class="wf warn" title="같은 고객·같은 금액이 두 줄 — 하나는 지우세요">중복?</span>' : "") + "</td></tr>";
-   }).join("") + '</tbody><tfoot><tr><td class="bh" colspan="3">합계 ' + rows.length + "건" + (warnN ? ' <span class="sub">(⚠ 확인 필요 ' + warnN + "건)</span>" : "") + '</td><td class="nm bh">' + won(tot) + "</td></tr></tfoot>";
+   t.innerHTML = '<colgroup><col style="width:46px"><col style="width:44%"><col><col style="width:74px"><col style="width:118px"></colgroup><thead><tr><th class="od">날짜</th><th>고객사 → 엔드유저</th><th>프로젝트</th><th>브랜드</th><th>금액 (공급가)</th></tr></thead><tbody>' + rows.map(function(i) {
+    return '<tr><td class="sub od">' + md(i.date) + "</td><td><b>" + esc(i.cust || titleOf(i)) + "</b>" + (endOf(i) ? " → " + esc(endOf(i)) : "") + '</td><td class="psel" data-id="' + esc(i.id) + '" title="눌러서 프로젝트 적기·고치기">' + (esc(projOf(i)) || (frozen ? "" : '<span class="sub noprint">적기</span>')) + '</td><td class="bsel" data-id="' + esc(i.id) + '" title="눌러서 브랜드 고르기">' + (esc(brandOf(i)) || (frozen ? "" : '<span class="sub noprint">고르기</span>')) + '</td><td class="nm asel" data-id="' + esc(i.id) + '" title="눌러서 금액 넣기·고치기">' + (i.amount ? won(i.amount) : /⚠/.test(i.content || "") ? '<span class="sub">금액 넣기</span>' : "-") + (/⚠/.test(i.content || "") ? ' <span class="wf warn" title="금액 확인 필요">⚠</span>' : "") + (isDup(i) ? ' <span class="wf warn" title="같은 고객·같은 금액이 두 줄 — 하나는 지우세요">중복?</span>' : "") + "</td></tr>";
+   }).join("") + '</tbody><tfoot><tr><td class="bh" colspan="4">합계 ' + rows.length + "건" + (warnN ? ' <span class="sub">(⚠ 확인 필요 ' + warnN + "건)</span>" : "") + '</td><td class="nm bh">' + won(tot) + "</td></tr></tfoot>";
    d.appendChild(t);
    if (!frozen) [].forEach.call(t.querySelectorAll("td.bsel"), function(td) {
     td.style.cursor = "pointer";
@@ -8341,11 +8347,64 @@ function renderReport() {
       fin = true;
       var v = sel.value;
       setBrand_([ it ], v);
-      td.innerHTML = esc(itemBrand_(it)) || '<span class="sub">브랜드 고르기</span>';
+      td.innerHTML = esc(itemBrand_(it)) || '<span class="sub noprint">고르기</span>';
       toast(v ? "브랜드 " + v + " 저장" : "브랜드 비움");
      };
      sel.onchange = done;
      sel.onblur = done;
+    };
+   });
+   if (!frozen) [].forEach.call(t.querySelectorAll("td.psel"), function(td) {
+    td.style.cursor = "pointer";
+    td.onclick = function() {
+     if (td.querySelector("input")) return;
+     var it = rows.filter(function(x) {
+      return String(x.id) === td.dataset.id;
+     })[0];
+     if (!it) return;
+     var inp = el("input");
+     inp.className = "noprint";
+     inp.type = "text";
+     inp.placeholder = "프로젝트";
+     inp.value = projOf(it);
+     inp.style.cssText = "width:100%;box-sizing:border-box;font:inherit;padding:3px 6px";
+     td.innerHTML = "";
+     td.appendChild(inp);
+     inp.focus();
+     inp.select();
+     var fin = false, cancel = function() {
+      if (fin) return;
+      fin = true;
+      renderReport();
+     }, done = function() {
+      if (fin) return;
+      var v = String(inp.value || "").trim();
+      if (v === projOf(it)) {
+       cancel();
+       return;
+      }
+      fin = true;
+      var live = (S.items || []).filter(function(x) {
+       return x.id === it.id;
+      })[0];
+      [ it, live ].forEach(function(x) {
+       if (x) x.proj = v;
+      });
+      if (!v) delete it.projQ;
+      save(live || it);
+      renderReport();
+      toast(v ? "프로젝트 저장" : "프로젝트 비움");
+     };
+     inp.onkeydown = function(e) {
+      if (e.key === "Enter") {
+       e.preventDefault();
+       done();
+      } else if (e.key === "Escape") {
+       e.preventDefault();
+       cancel();
+      }
+     };
+     inp.onblur = done;
     };
    });
    if (!frozen) [].forEach.call(t.querySelectorAll("td.asel"), function(td) {
@@ -8406,11 +8465,11 @@ function renderReport() {
    var tl = el("div", "row noprint");
    tl.style.cssText = "gap:8px;margin:6px 0 2px;align-items:center";
    var bc = el("button", "btn sm", "📋 엑셀로 복사");
-   bc.title = "고객사·브랜드·금액을 탭으로 나눠 복사 — 엑셀에 붙이면 칸이 맞아요";
+   bc.title = "고객사·엔드유저·프로젝트·브랜드·금액을 탭으로 나눠 복사 — 엑셀에 붙이면 칸이 맞아요";
    bc.onclick = function() {
-    var tsv = [ "날짜\t고객사\t브랜드\t금액" ].concat(rows.map(function(i) {
-     return [ i.date, i.cust || titleOf(i), brandOf(i), Number(i.amount) || 0 ].join("\t");
-    })).concat([ "합계\t\t\t" + tot ]).join("\n");
+    var tsv = [ "날짜\t고객사\t엔드유저\t프로젝트\t브랜드\t금액" ].concat(rows.map(function(i) {
+     return [ i.date, i.cust || titleOf(i), endOf(i), projOf(i), brandOf(i), Number(i.amount) || 0 ].join("\t");
+    })).concat([ "합계\t\t\t\t\t" + tot ]).join("\n");
     var done = function() {
      toast("엑셀에 붙여넣으세요 (" + rows.length + "건)");
     };
