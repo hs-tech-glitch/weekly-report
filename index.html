@@ -1,4 +1,4 @@
-<!-- 주간보고 화면 v1.47 -->
+<!-- 주간보고 화면 v1.48 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -67,10 +67,11 @@
 
 
 
+
 <link rel="manifest" href="weekly-report.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-weekly-192.png">
 <link rel="apple-touch-icon" href="icon-weekly-192.png">
-<title>HS TECH 주간보고 v1.47</title>
+<title>HS TECH 주간보고 v1.48</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -1377,7 +1378,8 @@ if (!window.google) {
      prev: 0,
      pm: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
      py: 0,
-     pc: 0
+     pc: 0,
+     cy: 0
     };
    });
    agg["기타"] = {
@@ -1385,13 +1387,19 @@ if (!window.google) {
     prev: 0,
     pm: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
     py: 0,
-    pc: 0
+    pc: 0,
+    cy: 0
    };
    var cut = "";
    all.forEach(function(x) {
     var d = String(x.date || "");
     if (d.slice(0, 4) === y && d > cut) cut = d;
    });
+   var tdy = function() {
+    var n = new Date;
+    return n.getFullYear() + "-" + ("0" + (n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2);
+   }();
+   if (cut > tdy) cut = tdy;
    var cutMD = cut.slice(5), cutM = Number(cut.slice(5, 7)) || 0;
    var pre = [], byVk = {};
    all.forEach(function(x) {
@@ -1481,6 +1489,7 @@ if (!window.google) {
      var mm = Number(x.date.slice(5, 7));
      a.m[mm - 1] += amtv;
      if (mm > maxM) maxM = mm;
+     if (cutMD && x.date.slice(5) <= cutMD) a.cy = (a.cy || 0) + amtv;
      if (g === "기타" && amtv > 0 && !x.fix && /선금|잔금|선수금|선급금|중도금|계약금/.test(String(x.item || ""))) {
       deps.push({
        id: x.id,
@@ -1560,6 +1569,7 @@ if (!window.google) {
      prevMonths: agg[n].pm || [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
      prevYtd: agg[n].py || 0,
      prevCut: agg[n].pc || 0,
+     ytd: agg[n].cy || 0,
      total: t,
      internal: !!bb.internal,
      overseas: !!bb.overseas
@@ -7733,14 +7743,16 @@ function renderReport() {
   }, 0);
   var yoOn = yoOn_(sl), yoOn0 = yoOn, pyS = L.reduce(function(a, x) {
    return a + (x.prevYtd || 0);
+  }, 0), cyS = L.reduce(function(a, x) {
+   return a + (x.ytd != null ? x.ytd : x.total);
   }, 0);
   var mx = Math.max.apply(null, L.map(function(x) {
    return Math.max(x.total, yoOn && x.name !== "기타" ? x.prevYtd || 0 : 0);
   }).concat([ 1 ]));
   var bh = '<div class="bars">' + L.map(function(g) {
    var we = Math.max(0, g.total) / mx * 100, ov = g.overseas, yoOn = yoOn0 && g.name !== "기타";
-   return (g === firstSub ? '<div class="bsep"></div>' : "") + '<div class="br' + (g.name === "기타" ? " excl" : "") + '" title="' + esc(g.name) + " " + mw(g.total) + " " + UNITS[unitOf()].name + (yoOn ? " · 전년 동기 " + mw(g.prevYtd || 0) : "") + '"><span class="bn">' + esc(g.name) + '</span><div class="bt' + (yoOn ? " yo2" : "") + '"><div class="seg ' + (g.internal ? "inn" : "ext") + '" style="width:' + we + '%"></div>' + (yoOn ? '<div class="pv" style="width:' + Math.max(0, g.prevYtd || 0) / mx * 100 + '%"></div>' : "") + '</div><span class="bv"><b>' + mw(g.total) + "</b> <small>" + (grand && g.total > 0 ? g.total / grand < .005 ? "<1%" : Math.round(g.total / grand * 100) + "%" : "") + "</small>" + (yoOn ? " " + yoTag_(g.total, g.prevYtd || 0) : "") + "</span></div>";
-  }).join("") + '<div class="br tot"><span class="bn">매출합계</span><div></div><span class="bv"><b>' + mw(grand) + "</b> <small>" + UNITS[unitOf()].name + '<span class="yr"> · ' + sl.year + "년 누계</span></small>" + (yoOn ? " " + yoTag_(grand, pyS) : "") + "</span></div></div>";
+   return (g === firstSub ? '<div class="bsep"></div>' : "") + '<div class="br' + (g.name === "기타" ? " excl" : "") + '" title="' + esc(g.name) + " " + mw(g.total) + " " + UNITS[unitOf()].name + (yoOn ? " · 전년 동기 " + mw(g.prevYtd || 0) : "") + '"><span class="bn">' + esc(g.name) + '</span><div class="bt' + (yoOn ? " yo2" : "") + '"><div class="seg ' + (g.internal ? "inn" : "ext") + '" style="width:' + we + '%"></div>' + (yoOn ? '<div class="pv" style="width:' + Math.max(0, g.prevYtd || 0) / mx * 100 + '%"></div>' : "") + '</div><span class="bv"><b>' + mw(g.total) + "</b> <small>" + (grand && g.total > 0 ? g.total / grand < .005 ? "<1%" : Math.round(g.total / grand * 100) + "%" : "") + "</small>" + (yoOn ? " " + yoTag_(g.ytd != null ? g.ytd : g.total, g.prevYtd || 0) : "") + "</span></div>";
+  }).join("") + '<div class="br tot"><span class="bn">매출합계</span><div></div><span class="bv"><b>' + mw(grand) + "</b> <small>" + UNITS[unitOf()].name + '<span class="yr"> · ' + sl.year + "년 누계</span></small>" + (yoOn ? " " + yoTag_(cyS, pyS) : "") + "</span></div></div>";
   d.appendChild(el("div", null, bh));
   var colM = function(mi) {
    return sl.rows.reduce(function(a, x) {
@@ -7750,7 +7762,7 @@ function renderReport() {
   var rows = L;
   var ht = '<table class="rep sales"><colgroup><col class="cb">' + (sl.prevAvail ? '<col class="cp2">' : "") + ms.map(function() {
    return '<col class="cm2">';
-  }).join("") + '<col class="ct"></colgroup><tr><th>항목</th>' + (sl.prevAvail ? "<th>" + (+sl.year - 1) + '년<br class="hb"> ' + (yoOn ? "동기" : "누계") + "</th>" : "") + ms.map(function(mi) {
+  }).join("") + '<col class="ct"></colgroup><tr><th>항목</th>' + (sl.prevAvail ? "<th>" + (+sl.year - 1) + '년<br class="hb"> ' + (yoOn ? "~" + +sl.cutDate.slice(5, 7) + "/" + +sl.cutDate.slice(8, 10) : "누계") + "</th>" : "") + ms.map(function(mi) {
    return "<th>" + mi + "월</th>";
   }).join("") + "<th>" + sl.year + '년<br class="hb"> 누계</th></tr>';
   rows.forEach(function(x) {
@@ -7769,7 +7781,7 @@ function renderReport() {
    return a + x.prev;
   }, 0)) + "</td>" : "") + ms.map(function(mi) {
    return '<td class="nm' + (mi === cur && sl.year === yNow ? " cm" : "") + '">' + mw(colM(mi)) + "</td>";
-  }).join("") + '<td class="nm">' + mw(grand) + "</td></tr>" + (yoOn ? yoRow_(sl, L, ms, grand, pyS) : "") + "</table>";
+  }).join("") + '<td class="nm">' + mw(grand) + "</td></tr>" + (yoOn ? yoRow_(sl, L, ms, cyS, pyS) : "") + "</table>";
   d.appendChild(el("div", "tw", ht));
   if (!frozen && sl.unmapped && sl.unmapped.length) {
    var um = sl.unmapped;
